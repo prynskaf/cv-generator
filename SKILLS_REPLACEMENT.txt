@@ -1,0 +1,20 @@
+// Helper to update skills
+const handleSkillChange = (index: number, field: 'skill_name' | 'skill_level', value: string) => {
+  const newSkills = [...skills]
+  newSkills[index][field] = value
+  setSkills(newSkills)
+}
+
+// In the render section, replace the skills.map with:
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {skills.map((skill, index) => (
+    <SkillCard
+      key={skill.id || index}
+      skill={skill}
+      index={index}
+      onSave={saveSkill}
+      onDelete={deleteSkill}
+      onChange={handleSkillChange}
+    />
+  ))}
+</div>
