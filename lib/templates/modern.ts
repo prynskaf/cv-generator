@@ -1,5 +1,69 @@
+// Helper function to remove duplicates from arrays
+function cleanCVData(data: any): any {
+  const cleaned = { ...data }
+  
+  // Remove duplicate skills
+  if (cleaned.skills && Array.isArray(cleaned.skills)) {
+    const seenSkills = new Set()
+    cleaned.skills = cleaned.skills.filter((skill: any) => {
+      const key = skill.skill_name?.toLowerCase()
+      if (!key || seenSkills.has(key)) return false
+      seenSkills.add(key)
+      return true
+    })
+  }
+  
+  // Remove duplicate languages
+  if (cleaned.languages && Array.isArray(cleaned.languages)) {
+    const seenLangs = new Set()
+    cleaned.languages = cleaned.languages.filter((lang: any) => {
+      const key = lang.name?.toLowerCase()
+      if (!key || seenLangs.has(key)) return false
+      seenLangs.add(key)
+      return true
+    })
+  }
+  
+  // Remove duplicate projects
+  if (cleaned.projects && Array.isArray(cleaned.projects)) {
+    const seenProjects = new Set()
+    cleaned.projects = cleaned.projects.filter((proj: any) => {
+      const key = proj.name?.toLowerCase()
+      if (!key || seenProjects.has(key)) return false
+      seenProjects.add(key)
+      return true
+    })
+  }
+  
+  // Remove duplicate experiences
+  if (cleaned.experiences && Array.isArray(cleaned.experiences)) {
+    const seenExps = new Set()
+    cleaned.experiences = cleaned.experiences.filter((exp: any) => {
+      const key = `${exp.company?.toLowerCase()}-${exp.position?.toLowerCase()}`
+      if (!key || seenExps.has(key)) return false
+      seenExps.add(key)
+      return true
+    })
+  }
+  
+  // Remove duplicate education
+  if (cleaned.education && Array.isArray(cleaned.education)) {
+    const seenEdu = new Set()
+    cleaned.education = cleaned.education.filter((edu: any) => {
+      const key = `${edu.institution?.toLowerCase()}-${edu.degree?.toLowerCase()}`
+      if (!key || seenEdu.has(key)) return false
+      seenEdu.add(key)
+      return true
+    })
+  }
+  
+  return cleaned
+}
+
 export function modernTemplate(data: any): string {
-  const { full_name, email, phone, location, summary, experiences, education, skills, links, languages, projects } = data
+  // Clean and deduplicate data
+  const cleanedData = cleanCVData(data)
+  const { full_name, email, phone, location, summary, experiences, education, skills, links, languages, projects } = cleanedData
 
   return `
 <!DOCTYPE html>
@@ -135,7 +199,7 @@ export function modernTemplate(data: any): string {
     ${summary ? `
     <div class="section">
       <div class="section-title">Professional Summary</div>
-      <div class="summary">${summary}</div>
+      <div class="summary">${cleanMarkdown(summary)}</div>
     </div>
     ` : ''}
 
@@ -145,10 +209,10 @@ export function modernTemplate(data: any): string {
       ${experiences.map((exp: any) => `
         <div class="experience-item">
           <div class="item-header">
-            <div class="item-title">${exp.position || ''}</div>
+            <div class="item-title">${cleanMarkdown(exp.position || '')}</div>
             <div class="item-date">${formatDate(exp.start_date)} - ${exp.is_current ? 'Present' : formatDate(exp.end_date)}</div>
           </div>
-          <div class="item-subtitle">${exp.company || ''}${exp.location ? ` | ${exp.location}` : ''}</div>
+          <div class="item-subtitle">${cleanMarkdown(exp.company || '')}${exp.location ? ` | ${cleanMarkdown(exp.location)}` : ''}</div>
           ${exp.description ? `<div class="item-description">${formatDescription(exp.description)}</div>` : ''}
         </div>
       `).join('')}
@@ -161,10 +225,10 @@ export function modernTemplate(data: any): string {
       ${education.map((edu: any) => `
         <div class="education-item">
           <div class="item-header">
-            <div class="item-title">${edu.degree || ''}${edu.field_of_study ? ` in ${edu.field_of_study}` : ''}</div>
+            <div class="item-title">${cleanMarkdown(edu.degree || '')}${edu.field_of_study ? ` in ${cleanMarkdown(edu.field_of_study)}` : ''}</div>
             <div class="item-date">${formatDate(edu.start_date)} - ${edu.is_current ? 'Present' : formatDate(edu.end_date)}</div>
           </div>
-          <div class="item-subtitle">${edu.institution || ''}${edu.location ? ` | ${edu.location}` : ''}</div>
+          <div class="item-subtitle">${cleanMarkdown(edu.institution || '')}${edu.location ? ` | ${cleanMarkdown(edu.location)}` : ''}</div>
           ${edu.description ? `<div class="item-description">${formatDescription(edu.description)}</div>` : ''}
         </div>
       `).join('')}
@@ -177,8 +241,8 @@ export function modernTemplate(data: any): string {
       <div class="skills-grid">
         ${skills.map((skill: any) => `
           <div class="skill-item">
-            <div class="skill-name">${skill.skill_name || ''}</div>
-            ${skill.skill_level ? `<div class="skill-level">${skill.skill_level}</div>` : ''}
+            <div class="skill-name">${cleanMarkdown(skill.skill_name || '')}</div>
+            ${skill.skill_level ? `<div class="skill-level">${cleanMarkdown(skill.skill_level)}</div>` : ''}
           </div>
         `).join('')}
       </div>
@@ -190,16 +254,30 @@ export function modernTemplate(data: any): string {
       <div class="section-title">Projects</div>
       ${projects.map((project: any) => `
         <div class="experience-item">
-          <div class="item-title">${project.name || ''}</div>
+          <div class="item-title">${cleanMarkdown(project.name || '')}</div>
           ${project.description ? `<div class="item-description">${formatDescription(project.description)}</div>` : ''}
           ${project.technologies && project.technologies.length > 0 ? `
             <div style="margin-top: 8px;">
               <span style="font-weight: bold; color: #1f2937; font-size: 10pt;">Technologies:</span>
-              <span style="color: #4b5563; font-size: 10pt;">${project.technologies.join(', ')}</span>
+              <span style="color: #4b5563; font-size: 10pt;">${project.technologies.map((t: string) => cleanMarkdown(t)).join(', ')}</span>
             </div>
           ` : ''}
         </div>
       `).join('')}
+    </div>
+    ` : ''}
+
+    ${languages && languages.length > 0 ? `
+    <div class="section">
+      <div class="section-title">Languages</div>
+      <div class="skills-grid">
+        ${languages.map((lang: any) => `
+          <div class="skill-item">
+            <div class="skill-name">${cleanMarkdown(lang.name || '')}</div>
+            ${lang.proficiency ? `<div class="skill-level">${cleanMarkdown(lang.proficiency)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
     </div>
     ` : ''}
 
@@ -228,18 +306,39 @@ function formatDate(dateString: string | null): string {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 }
 
+function cleanMarkdown(text: string): string {
+  if (!text) return ''
+  
+  return text
+    // Remove bold markdown (**text** or __text__)
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/__(.+?)__/g, '$1')
+    // Remove italic markdown (*text* or _text_)
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/_(.+?)_/g, '$1')
+    // Remove code blocks
+    .replace(/`(.+?)`/g, '$1')
+    // Remove headers (# ## ###)
+    .replace(/^#+\s*/gm, '')
+    // Clean up any remaining markdown artifacts
+    .trim()
+}
+
 function formatDescription(description: string): string {
   if (!description) return ''
   
+  // Clean markdown first
+  const cleanedDescription = cleanMarkdown(description)
+  
   // Split by periods, newlines, or bullet points
-  const sentences = description
+  const sentences = cleanedDescription
     .split(/[.\n]/)
-    .map(s => s.trim())
+    .map(s => cleanMarkdown(s.trim()))
     .filter(s => s.length > 20) // Filter out very short fragments
   
   if (sentences.length <= 1) {
     // If only one sentence, return as paragraph
-    return `<div style="text-align: justify;">${description}</div>`
+    return `<div style="text-align: justify;">${cleanedDescription}</div>`
   }
   
   // Multiple sentences - convert to bullet points

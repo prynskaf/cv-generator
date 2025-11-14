@@ -76,26 +76,42 @@ export async function analyzeJobDescription(
   jobDescription: string,
   userProfile: UserProfile
 ): Promise<JobAnalysis> {
-  const prompt = `Analyze the following job description and compare it with the candidate's profile.
+  const userSkills = userProfile.skills.map(s => `${s.skill_name} (${s.skill_level})`).join(', ')
+  
+  const prompt = `You are an AI skill relevance engine.
+Your job is to compare user skills with job description requirements for any industry.
+Use semantic reasoning, industry knowledge, and skill equivalence logic.
+Return results in the required JSON format only.
+If a job mentions a tool or technology, match it to the closest related skill when possible.
+Never include skills that are irrelevant for the job.
+Never hallucinate new skills.
 
-Job Description:
+Here are the user's skills:
+${userSkills}
+
+Here is the job description:
 ${jobDescription}
 
-Candidate Profile:
+Candidate Profile Context:
 Name: ${userProfile.full_name}
 Summary: ${userProfile.summary}
-Skills: ${userProfile.skills.map(s => `${s.skill_name} (${s.skill_level})`).join(', ')}
 Experience: ${userProfile.experiences.map(e => `${e.position} at ${e.company}`).join(', ')}
 
-Please analyze and provide:
-1. Key keywords from the job description
-2. Required skills mentioned in the job
-3. Main responsibilities
-4. Skills the candidate is missing
-5. Match percentage (0-100)
-6. Suggestions for improvement
+Step 1: Extract all skills mentioned in the job description.
+Step 2: Compare them with the user skills using exact + semantic matching.
+Step 3: Identify relevant skills (user has and job needs), missing skills (job needs but user lacks), and calculate match score.
 
-Return ONLY a valid JSON object with keys: keywords, required_skills, responsibilities, missing_skills, match_percentage, suggestions. No markdown, no code blocks, just the JSON.`
+Return ONLY a valid JSON object with this structure:
+{
+  "keywords": ["keyword1", "keyword2"],
+  "required_skills": ["skill1", "skill2"],
+  "responsibilities": ["responsibility1", "responsibility2"],
+  "missing_skills": ["missing_skill1", "missing_skill2"],
+  "match_percentage": 85,
+  "suggestions": ["suggestion1", "suggestion2"]
+}
+
+No markdown, no code blocks, just the JSON.`
 
   try {
     const text = await callGemini(prompt)
@@ -113,7 +129,7 @@ export async function generateTailoredCV(
   userProfile: UserProfile,
   analysis: JobAnalysis
 ): Promise<any> {
-  const prompt = `Create a tailored CV content for the following job application.
+  const prompt = `You are a professional CV writer creating tailored, ATS-optimized CVs.
 
 Job Description:
 ${jobDescription}
@@ -124,22 +140,61 @@ ${JSON.stringify(userProfile, null, 2)}
 Job Analysis:
 ${JSON.stringify(analysis, null, 2)}
 
-Please generate optimized CV content that:
-1. Emphasizes relevant experience and skills for this job
-2. Uses keywords from the job description
-3. Rewrites experience descriptions to match job responsibilities
-4. Highlights achievements relevant to the role
-5. Ensures ATS-friendly formatting
-6. **IMPORTANT**: Include ALL sections from the candidate profile:
+CRITICAL REQUIREMENTS - Follow ALL of these rules:
+
+1. **Content Quality**
+   - Write in perfect, natural English (British/American)
+   - Use professional, clear, concise language
+   - Every bullet point must be grammatically correct
+   - Avoid repetitive phrases and awkward wording
+   - Each bullet should start with a strong action verb (Led, Developed, Implemented, etc.)
+   - Quantify achievements with metrics when possible
+
+2. **NO DUPLICATES**
+   - Never repeat the same content
+   - Each bullet point must be unique
+   - Don't duplicate sections (e.g., only ONE "languages" array, not multiple)
+   - Remove redundant information
+
+3. **Formatting Rules**
+   - Output PLAIN TEXT only - NO markdown syntax (no **, no _, no #, no backticks)
+   - Never break technology names across lines (e.g., "Next.js" not "Next.\njs")
+   - Keep technology names intact (React, Next.js, TypeScript, Node.js)
+   - Do NOT add extra spaces or line breaks in technology names
+
+4. **Grammar & Style**
+   - Use past tense for completed roles
+   - Use present tense for current roles
+   - Maintain consistent tense throughout each entry
+   - Avoid passive voice - use active voice (e.g., "Built" not "Was built")
+   - Every sentence must be complete and grammatically correct
+
+5. **Content Structure**
+   - Each experience description should have 3-5 distinct bullet points
+   - Each bullet should highlight a different achievement or responsibility
+   - Prioritize impact and results over duties
+   - Use job description keywords naturally (don't force them)
+
+6. **Sections to Include**
    - Personal information (full_name, email, phone, location, summary)
    - Work experiences (all entries)
-   - Education (all entries)
+   - Education (all entries)  
    - Skills (all entries)
    - Links (linkedin, github, portfolio) - if provided
-   - Languages (all entries with proficiency levels) - if provided
+   - Languages (all entries with proficiency levels) - if provided, ONLY ONCE
    - Projects (all entries with technologies) - if provided
 
-Return ONLY a valid JSON object with the EXACT SAME STRUCTURE as the candidate profile but with optimized content. Include all fields even if they are empty. No markdown, no code blocks, just the JSON.`
+EXAMPLE OF GOOD BULLET POINTS:
+✅ "Led frontend development for a quiz application using React and Tailwind CSS, achieving 30% improvement in user engagement"
+✅ "Optimized REST API integrations, reducing response times by 25% and improving application performance"
+✅ "Developed scalable components using Next.js and TypeScript, enhancing platform reliability and maintainability"
+
+EXAMPLE OF BAD BULLET POINTS (DO NOT DO THIS):
+❌ "Contributed to building scalable frontend components and enhancing system architectures for performance optimization" (too generic)
+❌ "Engaged in problem-solving and analysis to translate business requirements into technical designs" (vague, no impact)
+❌ "Worked on Next.\njs projects" (broken technology name)
+
+Return ONLY a valid JSON object with the EXACT SAME STRUCTURE as the candidate profile but with optimized, grammatically correct, duplicate-free content. No markdown, no formatting symbols, just clean professional English in JSON.`
 
   try {
     const text = await callGemini(prompt)

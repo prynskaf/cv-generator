@@ -1,5 +1,75 @@
+// Helper function to remove duplicates from arrays
+function cleanCVData(data: any): any {
+  const cleaned = { ...data }
+  
+  // Remove duplicate skills
+  if (cleaned.skills && Array.isArray(cleaned.skills)) {
+    const seenSkills = new Set()
+    cleaned.skills = cleaned.skills.filter((skill: any) => {
+      const key = skill.skill_name?.toLowerCase()
+      if (!key || seenSkills.has(key)) return false
+      seenSkills.add(key)
+      return true
+    })
+  }
+  
+  // Remove duplicate languages
+  if (cleaned.languages && Array.isArray(cleaned.languages)) {
+    const seenLangs = new Set()
+    cleaned.languages = cleaned.languages.filter((lang: any) => {
+      const key = lang.name?.toLowerCase()
+      if (!key || seenLangs.has(key)) return false
+      seenLangs.add(key)
+      return true
+    })
+  }
+  
+  // Remove duplicate projects
+  if (cleaned.projects && Array.isArray(cleaned.projects)) {
+    const seenProjects = new Set()
+    cleaned.projects = cleaned.projects.filter((proj: any) => {
+      const key = proj.name?.toLowerCase()
+      if (!key || seenProjects.has(key)) return false
+      seenProjects.add(key)
+      return true
+    })
+  }
+  
+  return cleaned
+}
+
+function cleanMarkdown(text: string): string {
+  if (!text) return ''
+  
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/__(.+?)__/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/_(.+?)_/g, '$1')
+    .replace(/`(.+?)`/g, '$1')
+    .replace(/^#+\s*/gm, '')
+    .trim()
+}
+
+function formatDescription(description: string): string {
+  if (!description) return ''
+  
+  const cleanedDescription = cleanMarkdown(description)
+  const sentences = cleanedDescription
+    .split(/[.\n]/)
+    .map(s => cleanMarkdown(s.trim()))
+    .filter(s => s.length > 20)
+  
+  if (sentences.length <= 1) {
+    return `<div style="text-align: justify;">${cleanedDescription}</div>`
+  }
+  
+  return `<ul style="margin: 5px 0; padding-left: 20px;">${sentences.map(sentence => `<li style="margin-bottom: 4px;">${sentence.trim()}${sentence.endsWith('.') ? '' : '.'}</li>`).join('')}</ul>`
+}
+
 export function professionalTemplate(data: any): string {
-  const { full_name, email, phone, location, summary, experiences, education, skills } = data
+  const cleanedData = cleanCVData(data)
+  const { full_name, email, phone, location, summary, experiences, education, skills, links, languages, projects } = cleanedData
 
   return `
 <!DOCTYPE html>
@@ -83,6 +153,13 @@ export function professionalTemplate(data: any): string {
       text-align: justify;
       color: #4a5568;
     }
+    .item-description ul {
+      margin: 5px 0;
+      padding-left: 20px;
+    }
+    .item-description li {
+      margin-bottom: 4px;
+    }
     .skills-container {
       display: flex;
       flex-wrap: wrap;
@@ -96,23 +173,36 @@ export function professionalTemplate(data: any): string {
       font-size: 10pt;
       color: #2d3748;
     }
+    .skills-list {
+      font-size: 10pt;
+      line-height: 1.8;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>${full_name || 'Your Name'}</h1>
+      <h1>${cleanMarkdown(full_name || 'Your Name')}</h1>
       <div class="contact-info">
         ${email ? `<span>${email}</span>` : ''}
         ${phone ? `<span>${phone}</span>` : ''}
         ${location ? `<span>${location}</span>` : ''}
       </div>
+      ${links && (links.linkedin || links.github || links.portfolio) ? `
+      <div class="contact-info" style="margin-top: 8px;">
+        ${[
+          links.linkedin ? `<a href="${links.linkedin}" style="color: #4a5568; text-decoration: none;">LinkedIn</a>` : '',
+          links.github ? `<a href="${links.github}" style="color: #4a5568; text-decoration: none;">GitHub</a>` : '',
+          links.portfolio ? `<a href="${links.portfolio}" style="color: #4a5568; text-decoration: none;">Portfolio</a>` : ''
+        ].filter(Boolean).join(' | ')}
+      </div>
+      ` : ''}
     </div>
 
     ${summary ? `
     <div class="section">
       <div class="section-title">Summary</div>
-      <div class="summary">${summary}</div>
+      <div class="summary">${cleanMarkdown(summary)}</div>
     </div>
     ` : ''}
 
@@ -122,13 +212,13 @@ export function professionalTemplate(data: any): string {
       ${experiences.map((exp: any) => `
         <div class="experience-item">
           <div class="item-header">
-            <div class="item-title">${exp.position || ''}</div>
+            <div class="item-title">${cleanMarkdown(exp.position || '')}</div>
           </div>
           <div class="item-meta">
-            <span>${exp.company || ''}${exp.location ? ` - ${exp.location}` : ''}</span>
+            <span>${cleanMarkdown(exp.company || '')}${exp.location ? ` - ${cleanMarkdown(exp.location)}` : ''}</span>
             <span>${formatDate(exp.start_date)} - ${exp.is_current ? 'Present' : formatDate(exp.end_date)}</span>
           </div>
-          ${exp.description ? `<div class="item-description">${exp.description}</div>` : ''}
+          ${exp.description ? `<div class="item-description">${formatDescription(exp.description)}</div>` : ''}
         </div>
       `).join('')}
     </div>
@@ -140,13 +230,13 @@ export function professionalTemplate(data: any): string {
       ${education.map((edu: any) => `
         <div class="education-item">
           <div class="item-header">
-            <div class="item-title">${edu.degree || ''}${edu.field_of_study ? ` in ${edu.field_of_study}` : ''}</div>
+            <div class="item-title">${cleanMarkdown(edu.degree || '')}${edu.field_of_study ? ` in ${cleanMarkdown(edu.field_of_study)}` : ''}</div>
           </div>
           <div class="item-meta">
-            <span>${edu.institution || ''}${edu.location ? ` - ${edu.location}` : ''}</span>
+            <span>${cleanMarkdown(edu.institution || '')}${edu.location ? ` - ${cleanMarkdown(edu.location)}` : ''}</span>
             <span>${formatDate(edu.start_date)} - ${edu.is_current ? 'Present' : formatDate(edu.end_date)}</span>
           </div>
-          ${edu.description ? `<div class="item-description">${edu.description}</div>` : ''}
+          ${edu.description ? `<div class="item-description">${formatDescription(edu.description)}</div>` : ''}
         </div>
       `).join('')}
     </div>
@@ -157,8 +247,34 @@ export function professionalTemplate(data: any): string {
       <div class="section-title">Skills</div>
       <div class="skills-container">
         ${skills.map((skill: any) => `
-          <span class="skill-item">${skill.skill_name || ''}${skill.skill_level ? ` (${skill.skill_level})` : ''}</span>
+          <span class="skill-item">${cleanMarkdown(skill.skill_name || '')}${skill.skill_level ? ` (${cleanMarkdown(skill.skill_level)})` : ''}</span>
         `).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    ${projects && projects.length > 0 ? `
+    <div class="section">
+      <div class="section-title">Projects</div>
+      ${projects.map((project: any) => `
+        <div class="experience-item">
+          <div class="item-title">${cleanMarkdown(project.name || '')}</div>
+          ${project.description ? `<div class="item-description">${formatDescription(project.description)}</div>` : ''}
+          ${project.technologies && project.technologies.length > 0 ? `
+            <div style="margin-top: 8px; font-size: 10pt; color: #4a5568;">
+              <span style="font-weight: bold;">Technologies:</span> ${project.technologies.map((t: string) => cleanMarkdown(t)).join(', ')}
+            </div>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    ${languages && languages.length > 0 ? `
+    <div class="section">
+      <div class="section-title">Languages</div>
+      <div class="skills-list">
+        ${languages.map((lang: any) => `${cleanMarkdown(lang.name)} (${cleanMarkdown(lang.proficiency)})`).join(' • ')}
       </div>
     </div>
     ` : ''}
