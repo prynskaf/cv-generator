@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { generateCoverLetterDocx, generateCoverLetterTxt } from '@/lib/coverLetterGenerator'
 
 interface GeneratedDocument {
   id: string
@@ -141,14 +142,46 @@ export default function DashboardPage() {
     router.refresh()
   }
 
-  const downloadCoverLetter = (doc: GeneratedDocument) => {
-    const element = document.createElement('a')
-    const file = new Blob([doc.cover_letter_content], { type: 'text/plain' })
-    element.href = URL.createObjectURL(file)
-    element.download = `cover_letter_${doc.job_title.replace(/\s+/g, '_')}_${Date.now()}.txt`
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
+  const downloadCoverLetter = async (doc: GeneratedDocument, format: 'txt' | 'docx' = 'docx') => {
+    // Get user profile for applicant information
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('full_name, email, phone, location')
+      .eq('id', user.id)
+      .single()
+
+    const coverLetterData = {
+      applicantName: profile?.full_name || 'Your Name',
+      applicantEmail: profile?.email || '',
+      applicantPhone: profile?.phone || '',
+      applicantAddress: profile?.location || '',
+      companyName: doc.company_name || 'Company Name',
+      hiringManagerName: undefined,
+      jobTitle: doc.job_title,
+      coverLetterContent: doc.cover_letter_content
+    }
+
+    if (format === 'docx') {
+      const blob = await generateCoverLetterDocx(coverLetterData)
+      const element = document.createElement('a')
+      element.href = URL.createObjectURL(blob)
+      element.download = `cover_letter_${doc.job_title.replace(/\s+/g, '_')}_${Date.now()}.docx`
+      document.body.appendChild(element)
+      element.click()
+      document.body.removeChild(element)
+    } else {
+      const content = await generateCoverLetterTxt(coverLetterData)
+      const element = document.createElement('a')
+      const file = new Blob([content], { type: 'text/plain' })
+      element.href = URL.createObjectURL(file)
+      element.download = `cover_letter_${doc.job_title.replace(/\s+/g, '_')}_${Date.now()}.txt`
+      document.body.appendChild(element)
+      element.click()
+      document.body.removeChild(element)
+    }
   }
 
   const deleteDocument = async (documentId: string) => {
@@ -447,15 +480,39 @@ export default function DashboardPage() {
                       </svg>
                       {exporting === doc.id ? 'Exporting...' : 'Download CV (PDF)'}
                     </button>
-                    <button
-                      onClick={() => downloadCoverLetter(doc)}
-                      className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium flex items-center justify-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      Download Cover Letter
-                    </button>
+                    <div className="relative group">
+                      <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                        </svg>
+                        Download Cover Letter
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                        <button
+                          onClick={() => downloadCoverLetter(doc, 'docx')}
+                          className="w-full text-left px-4 py-2 hover:bg-purple-50 flex items-center gap-2 rounded-t-lg"
+                        >
+                          <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                            <path d="M14 2v6h6"/>
+                          </svg>
+                          Word Document (.docx)
+                        </button>
+                        <button
+                          onClick={() => downloadCoverLetter(doc, 'txt')}
+                          className="w-full text-left px-4 py-2 hover:bg-purple-50 flex items-center gap-2 rounded-b-lg"
+                        >
+                          <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                            <path d="M14 2v6h6"/>
+                          </svg>
+                          Text File (.txt)
+                        </button>
+                      </div>
+                    </div>
                     <button
                       onClick={() => deleteDocument(doc.id)}
                       className="w-full px-4 py-3 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition font-medium flex items-center justify-center gap-2"

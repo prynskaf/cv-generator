@@ -39,6 +39,20 @@ export interface UserProfile {
     skill_name: string
     skill_level: string
   }>
+  links?: {
+    linkedin: string
+    github: string
+    portfolio: string
+  }
+  languages?: Array<{
+    name: string
+    proficiency: string
+  }>
+  projects?: Array<{
+    name: string
+    description: string
+    technologies: string[]
+  }>
 }
 
 const ai = new GoogleGenAI({
@@ -116,8 +130,16 @@ Please generate optimized CV content that:
 3. Rewrites experience descriptions to match job responsibilities
 4. Highlights achievements relevant to the role
 5. Ensures ATS-friendly formatting
+6. **IMPORTANT**: Include ALL sections from the candidate profile:
+   - Personal information (full_name, email, phone, location, summary)
+   - Work experiences (all entries)
+   - Education (all entries)
+   - Skills (all entries)
+   - Links (linkedin, github, portfolio) - if provided
+   - Languages (all entries with proficiency levels) - if provided
+   - Projects (all entries with technologies) - if provided
 
-Return ONLY a valid JSON object with the same structure as the candidate profile but with optimized content. No markdown, no code blocks, just the JSON.`
+Return ONLY a valid JSON object with the EXACT SAME STRUCTURE as the candidate profile but with optimized content. Include all fields even if they are empty. No markdown, no code blocks, just the JSON.`
 
   try {
     const text = await callGemini(prompt)
@@ -137,6 +159,20 @@ export async function generateCoverLetter(
   jobTitle: string,
   companyName: string
 ): Promise<string> {
+  const profileDetails = `
+Name: ${userProfile.full_name}
+Email: ${userProfile.email}
+Phone: ${userProfile.phone}
+Summary: ${userProfile.summary}
+Skills: ${userProfile.skills.map(s => s.skill_name).join(', ')}
+Recent Experience: ${userProfile.experiences[0]?.position} at ${userProfile.experiences[0]?.company}
+${userProfile.languages && userProfile.languages.length > 0 ? `Languages: ${userProfile.languages.map(l => `${l.name} (${l.proficiency})`).join(', ')}` : ''}
+${userProfile.projects && userProfile.projects.length > 0 ? `Notable Projects: ${userProfile.projects.map(p => p.name).join(', ')}` : ''}
+${userProfile.links?.linkedin ? `LinkedIn: ${userProfile.links.linkedin}` : ''}
+${userProfile.links?.github ? `GitHub: ${userProfile.links.github}` : ''}
+${userProfile.links?.portfolio ? `Portfolio: ${userProfile.links.portfolio}` : ''}
+  `.trim()
+
   const prompt = `Write a professional cover letter for the following job application.
 
 Job Title: ${jobTitle}
@@ -146,10 +182,7 @@ Job Description:
 ${jobDescription}
 
 Candidate Profile:
-Name: ${userProfile.full_name}
-Summary: ${userProfile.summary}
-Skills: ${userProfile.skills.map(s => s.skill_name).join(', ')}
-Recent Experience: ${userProfile.experiences[0]?.position} at ${userProfile.experiences[0]?.company}
+${profileDetails}
 
 Job Match Analysis:
 Match Percentage: ${analysis.match_percentage}%
@@ -162,6 +195,8 @@ Please write a compelling cover letter that:
 4. Demonstrates value the candidate can bring
 5. Maintains a professional yet personable tone
 6. Is 3-4 paragraphs long
+7. If the candidate has relevant projects or languages, mention them when appropriate
+8. If portfolio/GitHub links are available, subtly reference online work when relevant
 
 Return just the cover letter text, no additional formatting or markdown.`
 

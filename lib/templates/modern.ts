@@ -1,5 +1,5 @@
 export function modernTemplate(data: any): string {
-  const { full_name, email, phone, location, summary, experiences, education, skills } = data
+  const { full_name, email, phone, location, summary, experiences, education, skills, links, languages, projects } = data
 
   return `
 <!DOCTYPE html>
@@ -81,6 +81,14 @@ export function modernTemplate(data: any): string {
     }
     .item-description {
       margin-top: 8px;
+    }
+    .item-description ul {
+      margin: 0;
+      padding-left: 20px;
+      list-style-type: disc;
+    }
+    .item-description li {
+      margin-bottom: 4px;
       text-align: justify;
     }
     .skills-grid {
@@ -113,6 +121,15 @@ export function modernTemplate(data: any): string {
         ${phone ? `<span>|</span><span>${phone}</span>` : ''}
         ${location ? `<span>|</span><span>${location}</span>` : ''}
       </div>
+      ${links && (links.linkedin || links.github || links.portfolio) ? `
+      <div class="contact-info" style="margin-top: 8px; font-size: 9pt;">
+        ${links.linkedin ? `<span><a href="${links.linkedin}" style="color: #2563eb; text-decoration: none;">LinkedIn</a></span>` : ''}
+        ${links.linkedin && (links.github || links.portfolio) ? `<span>|</span>` : ''}
+        ${links.github ? `<span><a href="${links.github}" style="color: #2563eb; text-decoration: none;">GitHub</a></span>` : ''}
+        ${links.github && links.portfolio ? `<span>|</span>` : ''}
+        ${links.portfolio ? `<span><a href="${links.portfolio}" style="color: #2563eb; text-decoration: none;">Portfolio</a></span>` : ''}
+      </div>
+      ` : ''}
     </div>
 
     ${summary ? `
@@ -132,7 +149,7 @@ export function modernTemplate(data: any): string {
             <div class="item-date">${formatDate(exp.start_date)} - ${exp.is_current ? 'Present' : formatDate(exp.end_date)}</div>
           </div>
           <div class="item-subtitle">${exp.company || ''}${exp.location ? ` | ${exp.location}` : ''}</div>
-          ${exp.description ? `<div class="item-description">${exp.description}</div>` : ''}
+          ${exp.description ? `<div class="item-description">${formatDescription(exp.description)}</div>` : ''}
         </div>
       `).join('')}
     </div>
@@ -148,7 +165,7 @@ export function modernTemplate(data: any): string {
             <div class="item-date">${formatDate(edu.start_date)} - ${edu.is_current ? 'Present' : formatDate(edu.end_date)}</div>
           </div>
           <div class="item-subtitle">${edu.institution || ''}${edu.location ? ` | ${edu.location}` : ''}</div>
-          ${edu.description ? `<div class="item-description">${edu.description}</div>` : ''}
+          ${edu.description ? `<div class="item-description">${formatDescription(edu.description)}</div>` : ''}
         </div>
       `).join('')}
     </div>
@@ -167,6 +184,38 @@ export function modernTemplate(data: any): string {
       </div>
     </div>
     ` : ''}
+
+    ${projects && projects.length > 0 ? `
+    <div class="section">
+      <div class="section-title">Projects</div>
+      ${projects.map((project: any) => `
+        <div class="experience-item">
+          <div class="item-title">${project.name || ''}</div>
+          ${project.description ? `<div class="item-description">${formatDescription(project.description)}</div>` : ''}
+          ${project.technologies && project.technologies.length > 0 ? `
+            <div style="margin-top: 8px;">
+              <span style="font-weight: bold; color: #1f2937; font-size: 10pt;">Technologies:</span>
+              <span style="color: #4b5563; font-size: 10pt;">${project.technologies.join(', ')}</span>
+            </div>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    ${languages && languages.length > 0 ? `
+    <div class="section">
+      <div class="section-title">Languages</div>
+      <div class="skills-grid">
+        ${languages.map((lang: any) => `
+          <div class="skill-item">
+            <div class="skill-name">${lang.name || ''}</div>
+            ${lang.proficiency ? `<div class="skill-level">${lang.proficiency}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
   </div>
 </body>
 </html>
@@ -177,4 +226,22 @@ function formatDate(dateString: string | null): string {
   if (!dateString) return ''
   const date = new Date(dateString)
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+}
+
+function formatDescription(description: string): string {
+  if (!description) return ''
+  
+  // Split by periods, newlines, or bullet points
+  const sentences = description
+    .split(/[.\n]/)
+    .map(s => s.trim())
+    .filter(s => s.length > 20) // Filter out very short fragments
+  
+  if (sentences.length <= 1) {
+    // If only one sentence, return as paragraph
+    return `<div style="text-align: justify;">${description}</div>`
+  }
+  
+  // Multiple sentences - convert to bullet points
+  return `<ul>${sentences.map(sentence => `<li>${sentence.trim()}${sentence.endsWith('.') ? '' : '.'}</li>`).join('')}</ul>`
 }

@@ -27,6 +27,31 @@ export interface Skill {
   id?: string
   skill_name: string
   skill_level: string
+  skill_category?: string
+}
+
+export interface Links {
+  id?: string
+  user_id?: string
+  linkedin: string
+  github: string
+  portfolio: string
+  other_links?: any[]
+}
+
+export interface Language {
+  id?: string
+  user_id?: string
+  name: string
+  proficiency: string
+}
+
+export interface Project {
+  id?: string
+  user_id?: string
+  name: string
+  description: string
+  technologies?: string[]
 }
 
 export interface UserProfile {

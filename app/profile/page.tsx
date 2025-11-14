@@ -8,7 +8,10 @@ import PersonalInfoSection from '@/components/profile/PersonalInfoSection'
 import ExperienceCard from '@/components/profile/ExperienceCard'
 import EducationCard from '@/components/profile/EducationCard'
 import SkillCard from '@/components/profile/SkillCard'
-import type { Experience, Education, Skill } from '@/types/profile'
+import LinksSection from '@/components/profile/LinksSection'
+import LanguageCard from '@/components/profile/LanguageCard'
+import ProjectCard from '@/components/profile/ProjectCard'
+import type { Experience, Education, Skill, Links, Language, Project } from '@/types/profile'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -22,6 +25,9 @@ export default function ProfilePage() {
   const [experiences, setExperiences] = useState<Experience[]>([])
   const [education, setEducation] = useState<Education[]>([])
   const [skills, setSkills] = useState<Skill[]>([])
+  const [links, setLinks] = useState<Links>({ linkedin: '', github: '', portfolio: '' })
+  const [languages, setLanguages] = useState<Language[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -93,6 +99,37 @@ export default function ProfilePage() {
       .eq('user_id', user.id)
 
     if (skillData) setSkills(skillData)
+
+    // Load links
+    const { data: linksData } = await supabase
+      .from('links')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    if (linksData) {
+      setLinks({
+        linkedin: linksData.linkedin || '',
+        github: linksData.github || '',
+        portfolio: linksData.portfolio || ''
+      })
+    }
+
+    // Load languages
+    const { data: languagesData } = await supabase
+      .from('languages')
+      .select('*')
+      .eq('user_id', user.id)
+
+    setLanguages(languagesData || [])
+
+    // Load projects
+    const { data: projectsData } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('user_id', user.id)
+
+    setProjects(projectsData || [])
 
     setLoading(false)
   }
@@ -262,6 +299,153 @@ export default function ProfilePage() {
     setSkills(skills.filter((_, i) => i !== index))
   }
 
+  const addLanguage = () => {
+    setLanguages([...languages, {
+      id: `temp-${Date.now()}-${Math.random()}`,
+      name: '',
+      proficiency: '',
+    }])
+  }
+
+  const saveLanguage = async (index: number) => {
+    const lang = languages[index]
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    if (lang.id?.startsWith('temp-')) {
+      const { error } = await supabase.from('languages').insert({
+        user_id: user.id,
+        name: lang.name,
+        proficiency: lang.proficiency
+      })
+      if (error) {
+        setMessage({ type: 'error', text: error.message })
+      } else {
+        setMessage({ type: 'success', text: 'Language added!' })
+        await loadProfile()
+      }
+    } else {
+      const { error } = await supabase.from('languages').update({
+        name: lang.name,
+        proficiency: lang.proficiency
+      }).eq('id', lang.id)
+      if (error) {
+        setMessage({ type: 'error', text: error.message })
+      } else {
+        setMessage({ type: 'success', text: 'Language updated!' })
+      }
+    }
+  }
+
+  const deleteLanguage = async (index: number) => {
+    const lang = languages[index]
+    if (lang.id?.startsWith('temp-')) {
+      setLanguages(languages.filter((_, i) => i !== index))
+    } else {
+      const { error } = await supabase.from('languages').delete().eq('id', lang.id)
+      if (error) {
+        setMessage({ type: 'error', text: error.message })
+      } else {
+        setLanguages(languages.filter((_, i) => i !== index))
+        setMessage({ type: 'success', text: 'Language deleted!' })
+      }
+    }
+  }
+
+  const addProject = () => {
+    setProjects([...projects, {
+      id: `temp-${Date.now()}-${Math.random()}`,
+      name: '',
+      description: '',
+      technologies: []
+    }])
+  }
+
+  const saveProject = async (index: number) => {
+    const proj = projects[index]
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    if (proj.id?.startsWith('temp-')) {
+      const { error } = await supabase.from('projects').insert({
+        user_id: user.id,
+        name: proj.name,
+        description: proj.description,
+        technologies: proj.technologies || []
+      })
+      if (error) {
+        setMessage({ type: 'error', text: error.message })
+      } else {
+        setMessage({ type: 'success', text: 'Project added!' })
+        await loadProfile()
+      }
+    } else {
+      const { error } = await supabase.from('projects').update({
+        name: proj.name,
+        description: proj.description,
+        technologies: proj.technologies || []
+      }).eq('id', proj.id)
+      if (error) {
+        setMessage({ type: 'error', text: error.message })
+      } else {
+        setMessage({ type: 'success', text: 'Project updated!' })
+      }
+    }
+  }
+
+  const deleteProject = async (index: number) => {
+    const proj = projects[index]
+    if (proj.id?.startsWith('temp-')) {
+      setProjects(projects.filter((_, i) => i !== index))
+    } else {
+      const { error } = await supabase.from('projects').delete().eq('id', proj.id)
+      if (error) {
+        setMessage({ type: 'error', text: error.message })
+      } else {
+        setProjects(projects.filter((_, i) => i !== index))
+        setMessage({ type: 'success', text: 'Project deleted!' })
+      }
+    }
+  }
+
+  const saveLinks = async () => {
+    setSaving(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: existingLinks } = await supabase
+      .from('links')
+      .select('id')
+      .eq('user_id', user.id)
+      .single()
+
+    if (existingLinks) {
+      const { error } = await supabase.from('links').update({
+        linkedin: links.linkedin,
+        github: links.github,
+        portfolio: links.portfolio
+      }).eq('user_id', user.id)
+      if (error) {
+        setMessage({ type: 'error', text: error.message })
+      } else {
+        setMessage({ type: 'success', text: 'Links updated!' })
+      }
+    } else {
+      const { error } = await supabase.from('links').insert({
+        user_id: user.id,
+        linkedin: links.linkedin,
+        github: links.github,
+        portfolio: links.portfolio
+      })
+      if (error) {
+        setMessage({ type: 'error', text: error.message })
+      } else {
+        setMessage({ type: 'success', text: 'Links saved!' })
+      }
+    }
+    setSaving(false)
+  }
+
   const handlePersonalInfoChange = (field: string, value: string) => {
     switch(field) {
       case 'fullName': setFullName(value); break
@@ -288,6 +472,22 @@ export default function ProfilePage() {
     const newSkills = [...skills]
     newSkills[index] = { ...newSkills[index], [field]: value }
     setSkills(newSkills)
+  }
+
+  const handleLinkChange = (field: keyof Link, value: string) => {
+    setLinks({ ...links, [field]: value })
+  }
+
+  const handleLanguageChange = (index: number, field: keyof Language, value: string) => {
+    const newLanguages = [...languages]
+    newLanguages[index] = { ...newLanguages[index], [field]: value }
+    setLanguages(newLanguages)
+  }
+
+  const handleProjectChange = (index: number, field: keyof Project, value: string | string[]) => {
+    const newProjects = [...projects]
+    newProjects[index] = { ...newProjects[index], [field]: value }
+    setProjects(newProjects)
   }
 
   const handleLogout = async () => {
@@ -654,6 +854,112 @@ export default function ProfilePage() {
 
             </div>
           )}
+        </div>
+
+        {/* Links Section */}
+        <LinksSection
+          links={links}
+          saving={saving}
+          onChange={handleLinkChange}
+          onSave={saveLinks}
+        />
+
+        {/* Languages Section */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mt-8">
+          <div className="p-6 bg-gradient-to-br from-orange-50 to-red-50">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-md">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Languages</h2>
+                  <p className="text-sm text-gray-600">Languages you speak</p>
+                </div>
+              </div>
+              <button
+                onClick={addLanguage}
+                className="px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white font-semibold rounded-lg hover:from-orange-700 hover:to-red-700 transition shadow-md"
+              >
+                + Add Language
+              </button>
+            </div>
+          </div>
+          <div className="p-6 border-t border-gray-200">
+            {languages.length === 0 ? (
+              <div className="text-center py-12">
+                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                <p className="mt-4 text-gray-500">No languages added yet.</p>
+                <p className="text-gray-400 text-sm">Click &quot;Add Language&quot; to get started!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {languages.map((language, index) => (
+                  <LanguageCard
+                    key={language.id}
+                    language={language}
+                    index={index}
+                    onSave={saveLanguage}
+                    onDelete={deleteLanguage}
+                    onChange={handleLanguageChange}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Projects Section */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mt-8">
+          <div className="p-6 bg-gradient-to-br from-teal-50 to-emerald-50">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-md">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Projects</h2>
+                  <p className="text-sm text-gray-600">Your personal and professional projects</p>
+                </div>
+              </div>
+              <button
+                onClick={addProject}
+                className="px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-teal-700 hover:to-emerald-700 transition shadow-md"
+              >
+                + Add Project
+              </button>
+            </div>
+          </div>
+          <div className="p-6 border-t border-gray-200">
+            {projects.length === 0 ? (
+              <div className="text-center py-12">
+                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <p className="mt-4 text-gray-500">No projects added yet.</p>
+                <p className="text-gray-400 text-sm">Click &quot;Add Project&quot; to get started!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {projects.map((project, index) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    index={index}
+                    onSave={saveProject}
+                    onDelete={deleteProject}
+                    onChange={handleProjectChange}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

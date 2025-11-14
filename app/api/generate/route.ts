@@ -47,6 +47,22 @@ export async function POST(request: NextRequest) {
       .select('*')
       .eq('user_id', user.id)
 
+    const { data: links } = await supabase
+      .from('links')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    const { data: languages } = await supabase
+      .from('languages')
+      .select('*')
+      .eq('user_id', user.id)
+
+    const { data: projects } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('user_id', user.id)
+
     const userProfile: UserProfile = {
       full_name: profile.full_name,
       email: profile.email,
@@ -56,6 +72,9 @@ export async function POST(request: NextRequest) {
       experiences: experiences || [],
       education: education || [],
       skills: skills || [],
+      links: links || { linkedin: '', github: '', portfolio: '' },
+      languages: languages || [],
+      projects: projects || [],
     }
 
     const analysis = await analyzeJobDescription(job_description, userProfile)
