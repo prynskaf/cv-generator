@@ -474,7 +474,7 @@ export default function ProfilePage() {
     setSkills(newSkills)
   }
 
-  const handleLinkChange = (field: keyof Link, value: string) => {
+  const handleLinkChange = (field: keyof Links, value: string) => {
     setLinks({ ...links, [field]: value })
   }
 

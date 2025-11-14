@@ -70,7 +70,9 @@ export async function POST(request: NextRequest) {
     if (uploadError) {
       console.error('Upload error:', uploadError)
       
-      const base64 = pdfBuffer.toString('base64')
+      // Convert Uint8Array to Buffer then to base64
+      const buffer = Buffer.from(pdfBuffer)
+      const base64 = buffer.toString('base64')
       const dataUrl = `data:application/pdf;base64,${base64}`
       
       return NextResponse.json({
