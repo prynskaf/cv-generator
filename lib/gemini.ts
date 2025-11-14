@@ -64,11 +64,12 @@ async function callGemini(prompt: string): Promise<string> {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
-    })
-    return response.text
+    });
+
+    return response.text ?? ""; // fallback to empty string
   } catch (error: any) {
-    console.error('Gemini error:', error.message)
-    throw error
+    console.error("Gemini error:", error.message);
+    throw error;
   }
 }
 
