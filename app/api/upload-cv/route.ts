@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { extractCVData, type ExtractedCVData } from '@/lib/gemini'
 import mammoth from 'mammoth'
-import PDFParser from 'pdf2json'
+import * as pdfjsLib from 'pdfjs-dist'
+
+if (typeof process !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+}
 
 function normalizeDate(dateString: string | null | undefined): string | null {
   if (!dateString) return null
@@ -26,26 +30,26 @@ function normalizeDate(dateString: string | null | undefined): string | null {
 }
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const pdfParser = new (PDFParser as any)(null, 1)
+  try {
+    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) })
+    const pdf = await loadingTask.promise
     
-    pdfParser.on('pdfParser_dataError', (errData: any) => {
-      console.error('PDF parsing error:', errData.parserError)
-      reject(new Error('Failed to extract text from PDF'))
-    })
+    let fullText = ''
     
-    pdfParser.on('pdfParser_dataReady', () => {
-      try {
-        const text = (pdfParser as any).getRawTextContent()
-        resolve(text)
-      } catch (error) {
-        console.error('PDF text extraction error:', error)
-        reject(new Error('Failed to extract text from PDF'))
-      }
-    })
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i)
+      const textContent = await page.getTextContent()
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ')
+      fullText += pageText + '\n'
+    }
     
-    pdfParser.parseBuffer(buffer)
-  })
+    return fullText
+  } catch (error) {
+    console.error('PDF extraction error:', error)
+    throw new Error('Failed to extract text from PDF')
+  }
 }
 
 async function extractTextFromDOCX(buffer: Buffer): Promise<string> {
