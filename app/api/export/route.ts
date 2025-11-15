@@ -40,9 +40,8 @@ export async function POST(request: NextRequest) {
 
     browser = await puppeteer.launch({
       args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: true,
     })
 
     const page = await browser.newPage()
@@ -63,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const fileName = `cv_${document.job_title.replace(/\s+/g, '_')}_${Date.now()}.pdf`
     
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(Buffer.from(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${fileName}"`,
