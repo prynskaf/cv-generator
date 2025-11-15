@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getTemplate } from '@/lib/templates'
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 
 export async function POST(request: NextRequest) {
   let browser
@@ -38,8 +39,10 @@ export async function POST(request: NextRequest) {
     const html = getTemplate(selectedTemplate, cvContent)
 
     browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     })
 
     const page = await browser.newPage()
@@ -60,42 +63,11 @@ export async function POST(request: NextRequest) {
 
     const fileName = `cv_${document.job_title.replace(/\s+/g, '_')}_${Date.now()}.pdf`
     
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('documents')
-      .upload(`${user.id}/${fileName}`, pdfBuffer, {
-        contentType: 'application/pdf',
-        upsert: false,
-      })
-
-    if (uploadError) {
-      console.error('Upload error:', uploadError)
-      
-      // Convert Uint8Array to Buffer then to base64
-      const buffer = Buffer.from(pdfBuffer)
-      const base64 = buffer.toString('base64')
-      const dataUrl = `data:application/pdf;base64,${base64}`
-      
-      return NextResponse.json({
-        success: true,
-        download_url: dataUrl,
-        fileName,
-        storage_error: uploadError.message
-      })
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('documents')
-      .getPublicUrl(uploadData.path)
-
-    await supabase
-      .from('generated_documents')
-      .update({ pdf_url: publicUrl })
-      .eq('id', document_id)
-
-    return NextResponse.json({
-      success: true,
-      pdf_url: publicUrl,
-      fileName,
+    return new NextResponse(pdfBuffer, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+      },
     })
   } catch (error: any) {
     console.error('Export error:', error)

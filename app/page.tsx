@@ -220,7 +220,7 @@ export default function Home() {
               </div>
               <span className="text-xl font-bold">CV Generator</span>
             </div>
-            <p className="text-gray-400">&copy; 2024 CV Generator. All rights reserved.</p>
+            <p className="text-gray-400">&copy; { new Date().getFullYear()} CV Generator. All rights reserved.</p>
           </div>
         </div>
       </footer>
