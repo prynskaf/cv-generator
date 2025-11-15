@@ -2,19 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { extractCVData, type ExtractedCVData } from '@/lib/gemini'
 import mammoth from 'mammoth'
-import { PDFParse } from 'pdf-parse'
-import { join } from 'path'
-
-const workerPath = join(
-  process.cwd(),
-  'node_modules',
-  'pdf-parse',
-  'dist',
-  'worker',
-  'pdf.worker.mjs'
-)
-
-PDFParse.setWorker(workerPath)
+import PDFParser from 'pdf2json'
 
 function normalizeDate(dateString: string | null | undefined): string | null {
   if (!dateString) return null
@@ -38,15 +26,26 @@ function normalizeDate(dateString: string | null | undefined): string | null {
 }
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  try {
-    const parser = new PDFParse({ data: buffer })
-    const result = await parser.getText()
-    await parser.destroy()
-    return result.text
-  } catch (error) {
-    console.error('PDF extraction error:', error)
-    throw new Error('Failed to extract text from PDF')
-  }
+  return new Promise((resolve, reject) => {
+    const pdfParser = new (PDFParser as any)(null, 1)
+    
+    pdfParser.on('pdfParser_dataError', (errData: any) => {
+      console.error('PDF parsing error:', errData.parserError)
+      reject(new Error('Failed to extract text from PDF'))
+    })
+    
+    pdfParser.on('pdfParser_dataReady', () => {
+      try {
+        const text = (pdfParser as any).getRawTextContent()
+        resolve(text)
+      } catch (error) {
+        console.error('PDF text extraction error:', error)
+        reject(new Error('Failed to extract text from PDF'))
+      }
+    })
+    
+    pdfParser.parseBuffer(buffer)
+  })
 }
 
 async function extractTextFromDOCX(buffer: Buffer): Promise<string> {
