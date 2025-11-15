@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [generatedDoc, setGeneratedDoc] = useState<any>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   
   const supabase = createClient()
   const router = useRouter()
@@ -113,20 +114,20 @@ export default function DashboardPage() {
         }),
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
+        const data = await response.json()
         throw new Error(data.error || 'Export failed')
       }
 
-      if (data.pdf_url) {
-        window.open(data.pdf_url, '_blank')
-      } else if (data.download_url) {
-        const a = document.createElement('a')
-        a.href = data.download_url
-        a.download = data.fileName
-        a.click()
-      }
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `cv_${Date.now()}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
 
       await loadDocuments()
     } catch (err: any) {
@@ -480,8 +481,10 @@ export default function DashboardPage() {
                       </svg>
                       {exporting === doc.id ? 'Exporting...' : 'Download CV (PDF)'}
                     </button>
-                    <div className="relative group">
-                      <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium">
+                    <div className="relative">
+                      <button 
+                        onClick={() => setOpenDropdown(openDropdown === doc.id ? null : doc.id)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                         </svg>
@@ -490,28 +493,36 @@ export default function DashboardPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </button>
-                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                        <button
-                          onClick={() => downloadCoverLetter(doc, 'docx')}
-                          className="w-full text-left px-4 py-2 hover:bg-purple-50 flex items-center gap-2 rounded-t-lg"
-                        >
-                          <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
-                            <path d="M14 2v6h6"/>
-                          </svg>
-                          Word Document (.docx)
-                        </button>
-                        <button
-                          onClick={() => downloadCoverLetter(doc, 'txt')}
-                          className="w-full text-left px-4 py-2 hover:bg-purple-50 flex items-center gap-2 rounded-b-lg"
-                        >
-                          <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
-                            <path d="M14 2v6h6"/>
-                          </svg>
-                          Text File (.txt)
-                        </button>
-                      </div>
+                      {openDropdown === doc.id && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                          <button
+                            onClick={() => {
+                              downloadCoverLetter(doc, 'docx')
+                              setOpenDropdown(null)
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-purple-50 flex items-center gap-2 rounded-t-lg"
+                          >
+                            <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                              <path d="M14 2v6h6"/>
+                            </svg>
+                            Word Document (.docx)
+                          </button>
+                          <button
+                            onClick={() => {
+                              downloadCoverLetter(doc, 'txt')
+                              setOpenDropdown(null)
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-purple-50 flex items-center gap-2 rounded-b-lg"
+                          >
+                            <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                              <path d="M14 2v6h6"/>
+                            </svg>
+                            Text File (.txt)
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={() => deleteDocument(doc.id)}
