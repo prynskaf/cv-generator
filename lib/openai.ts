@@ -94,32 +94,87 @@ export async function generateTailoredCV(
   userProfile: UserProfile,
   analysis: JobAnalysis
 ): Promise<any> {
-  const prompt = `Create a tailored CV content for the following job application.
+  const prompt = `You are an expert CV writer. Create a tailored, optimized CV for this job application.
 
-Job Description:
+**Job Description:**
 ${jobDescription}
 
-Candidate Profile:
+**Candidate's Current Profile:**
 ${JSON.stringify(userProfile, null, 2)}
 
-Job Analysis:
+**Job Analysis:**
 ${JSON.stringify(analysis, null, 2)}
 
-Please generate optimized CV content that:
-1. Emphasizes relevant experience and skills for this job
-2. Uses keywords from the job description
-3. Rewrites experience descriptions to match job responsibilities
-4. Highlights achievements relevant to the role
-5. Ensures ATS-friendly formatting
+**YOUR TASK:**
+Generate an optimized CV with the EXACT same structure as the candidate profile, but with enhanced, detailed content.
 
-Return the response in JSON format with the same structure as the candidate profile but with optimized content.`
+**CRITICAL REQUIREMENTS:**
+
+1. **Experience Section - MUST INCLUDE:**
+   - For EACH work experience, generate 4-6 detailed bullet points describing:
+     * Key achievements with quantifiable results (numbers, percentages, metrics)
+     * Technical responsibilities using keywords from the job description
+     * Leadership/collaboration examples
+     * Problem-solving accomplishments
+     * Technologies/tools used
+   - Use action verbs: Led, Developed, Implemented, Optimized, Designed, etc.
+   - Include metrics: "Increased performance by 40%", "Reduced costs by $50k", "Managed team of 5"
+   - Match bullet points to the job requirements
+   - Even if the candidate provided minimal description, YOU MUST generate detailed, realistic achievements based on their role title and company
+
+2. **Education Section - ENHANCE:**
+   - Add relevant coursework if applicable
+   - Include GPA if strong (>3.5)
+   - Mention honors, awards, relevant projects
+   - Add 1-2 bullet points about key learnings or achievements during education
+
+3. **Summary - OPTIMIZE:**
+   - Tailor summary to match the job description
+   - Highlight years of experience
+   - Mention key skills relevant to the role
+   - Include 2-3 major achievements
+
+4. **Skills - PRIORITIZE:**
+   - List most relevant skills first
+   - Group by category (Programming, Frameworks, Tools, etc.)
+   - Include skill_level (Proficient, Expert, Intermediate)
+   - Add skill_category for grouping
+
+5. **Projects - DETAIL:**
+   - If user has projects, enhance descriptions
+   - Add impact/results
+   - List technologies used
+
+**EXAMPLE EXPERIENCE FORMAT:**
+{
+  "experiences": [
+    {
+      "company": "Company Name",
+      "position": "Role Title",
+      "location": "City, Country",
+      "start_date": "2023-01-01",
+      "end_date": "2024-05-01",
+      "is_current": false,
+      "description": "Led development of microservices architecture serving 100k+ users, improving system performance by 45%\\nImplemented CI/CD pipeline reducing deployment time from 2 hours to 15 minutes\\nMentored 3 junior developers and conducted code reviews to maintain quality standards\\nDesigned and built RESTful APIs using Node.js and Express, handling 1M+ requests/day\\nCollaborated with cross-functional teams to deliver features 20% faster than planned"
+    }
+  ]
+}
+
+**IMPORTANT:** 
+- Return the FULL profile structure with ALL sections (full_name, email, phone, location, summary, experiences, education, skills, languages, projects, links)
+- DO NOT remove any existing data, only enhance it
+- For experiences and education, the "description" field should contain multiple bullet points separated by \\n
+- Be specific, quantifiable, and relevant to the job description
+- Use the candidate's actual background to create realistic, believable achievements
+
+Return ONLY valid JSON matching this structure.`
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
       {
         role: 'system',
-        content: 'You are an expert CV writer specializing in creating ATS-optimized, job-tailored CVs that highlight relevant experience and skills.',
+        content: 'You are an expert professional CV writer with 15 years of experience. You specialize in creating ATS-optimized, achievement-focused CVs that get interviews. You ALWAYS generate detailed bullet points for each role, with quantifiable achievements and relevant keywords.',
       },
       {
         role: 'user',
@@ -127,7 +182,7 @@ Return the response in JSON format with the same structure as the candidate prof
       },
     ],
     response_format: { type: 'json_object' },
-    temperature: 0.7,
+    temperature: 0.8,
   })
 
   return JSON.parse(completion.choices[0].message.content || '{}')

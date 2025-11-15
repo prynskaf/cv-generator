@@ -84,12 +84,6 @@ If port 3000 is taken:
 npm run dev -- -p 3001
 \`\`\`
 
-### Puppeteer Installation Issues
-If Puppeteer fails to install:
-\`\`\`bash
-npm install puppeteer --ignore-scripts
-\`\`\`
-
 ### Supabase Connection Error
 - Verify your `.env.local` has the correct URL and key
 - Check that Supabase project is active (not paused)
