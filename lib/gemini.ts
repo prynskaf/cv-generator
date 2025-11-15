@@ -130,72 +130,72 @@ export async function generateTailoredCV(
   userProfile: UserProfile,
   analysis: JobAnalysis
 ): Promise<any> {
-  const prompt = `You are a professional CV writer creating tailored, ATS-optimized CVs.
+  const prompt = `You are an expert professional CV writer with 15 years of experience. Create a tailored, optimized CV for this job application.
 
-Job Description:
+**Job Description:**
 ${jobDescription}
 
-Candidate Profile:
+**Candidate's Current Profile:**
 ${JSON.stringify(userProfile, null, 2)}
 
-Job Analysis:
+**Job Analysis:**
 ${JSON.stringify(analysis, null, 2)}
 
-CRITICAL REQUIREMENTS - Follow ALL of these rules:
+**YOUR CRITICAL TASK:**
+Generate an optimized CV with the EXACT same JSON structure, but with enhanced, detailed content.
 
-1. **Content Quality**
-   - Write in perfect, natural English (British/American)
-   - Use professional, clear, concise language
-   - Every bullet point must be grammatically correct
-   - Avoid repetitive phrases and awkward wording
-   - Each bullet should start with a strong action verb (Led, Developed, Implemented, etc.)
-   - Quantify achievements with metrics when possible
+**MANDATORY REQUIREMENTS:**
 
-2. **NO DUPLICATES**
-   - Never repeat the same content
-   - Each bullet point must be unique
-   - Don't duplicate sections (e.g., only ONE "languages" array, not multiple)
-   - Remove redundant information
+1. **Experience Section - MUST GENERATE DETAILED BULLET POINTS:**
+   - For EACH work experience, create 4-6 bullet points with:
+     * Quantifiable achievements (numbers, percentages, metrics)
+     * Technical responsibilities using job description keywords
+     * Leadership and collaboration examples
+     * Problem-solving accomplishments
+     * Technologies and tools used
+   - Use action verbs: Led, Developed, Implemented, Optimized, Increased, Reduced
+   - Include specific metrics: "Improved performance by 40%", "Managed team of 5", "Reduced costs by $50k"
+   - EVEN IF the user's description is short or empty, YOU MUST generate realistic, detailed achievements based on their job title and company
+   - Separate bullet points with \\n in the description field
 
-3. **Formatting Rules**
-   - Output PLAIN TEXT only - NO markdown syntax (no **, no _, no #, no backticks)
-   - Never break technology names across lines (e.g., "Next.js" not "Next.\njs")
-   - Keep technology names intact (React, Next.js, TypeScript, Node.js)
-   - Do NOT add extra spaces or line breaks in technology names
+2. **Education Section - ENHANCE:**
+   - Add relevant coursework, honors, achievements
+   - Include GPA if strong
+   - Add 1-2 bullet points about projects or learnings
 
-4. **Grammar & Style**
-   - Use past tense for completed roles
-   - Use present tense for current roles
-   - Maintain consistent tense throughout each entry
-   - Avoid passive voice - use active voice (e.g., "Built" not "Was built")
-   - Every sentence must be complete and grammatically correct
+3. **Summary - OPTIMIZE:**
+   - Tailor to match job requirements
+   - Highlight years of experience and key skills
+   - Include 2-3 major career achievements
 
-5. **Content Structure**
-   - Each experience description should have 3-5 distinct bullet points
-   - Each bullet should highlight a different achievement or responsibility
-   - Prioritize impact and results over duties
-   - Use job description keywords naturally (don't force them)
+4. **Skills - CATEGORIZE:**
+   - Group by category (Programming, Frameworks, Tools, etc.)
+   - Include skill_level and skill_category
+   - Prioritize skills relevant to the job
 
-6. **Sections to Include**
-   - Personal information (full_name, email, phone, location, summary)
-   - Work experiences (all entries)
-   - Education (all entries)  
-   - Skills (all entries)
-   - Links (linkedin, github, portfolio) - if provided
-   - Languages (all entries with proficiency levels) - if provided, ONLY ONCE
-   - Projects (all entries with technologies) - if provided
+**EXAMPLE EXPERIENCE OUTPUT:**
+{
+  "experiences": [
+    {
+      "company": "BeCode",
+      "position": "Junior Web Developer Trainee",
+      "location": "Brussels",
+      "start_date": "2023-05-01",
+      "end_date": "2023-11-01",
+      "is_current": false,
+      "description": "Developed 5+ full-stack web applications using React, Node.js, and MongoDB, serving 1000+ users\\nImplemented responsive UI/UX designs improving mobile user engagement by 35%\\nCollaborated with team of 4 developers using Git version control and Agile methodologies\\nBuilt RESTful APIs and integrated third-party services including Stripe and Auth0\\nConducted code reviews and pair programming sessions, improving code quality by 25%\\nOptimized database queries reducing page load time by 40%"
+    }
+  ]
+}
 
-EXAMPLE OF GOOD BULLET POINTS:
-✅ "Led frontend development for a quiz application using React and Tailwind CSS, achieving 30% improvement in user engagement"
-✅ "Optimized REST API integrations, reducing response times by 25% and improving application performance"
-✅ "Developed scalable components using Next.js and TypeScript, enhancing platform reliability and maintainability"
+**IMPORTANT:**
+- Return COMPLETE JSON with ALL fields: full_name, email, phone, location, summary, experiences, education, skills, languages, projects, links
+- DO NOT remove existing data, only enhance it
+- For experiences/education, put multiple bullet points in "description" field separated by \\n
+- Be specific, quantifiable, and realistic based on the candidate's actual background
+- Use job description keywords naturally throughout
 
-EXAMPLE OF BAD BULLET POINTS (DO NOT DO THIS):
-❌ "Contributed to building scalable frontend components and enhancing system architectures for performance optimization" (too generic)
-❌ "Engaged in problem-solving and analysis to translate business requirements into technical designs" (vague, no impact)
-❌ "Worked on Next.\njs projects" (broken technology name)
-
-Return ONLY a valid JSON object with the EXACT SAME STRUCTURE as the candidate profile but with optimized, grammatically correct, duplicate-free content. No markdown, no formatting symbols, just clean professional English in JSON.`
+Return ONLY valid JSON, no markdown, no code blocks.`
 
   try {
     const text = await callGemini(prompt)
@@ -207,7 +207,6 @@ Return ONLY a valid JSON object with the EXACT SAME STRUCTURE as the candidate p
     return mockAI.generateTailoredCV(jobDescription, userProfile, analysis)
   }
 }
-
 export async function generateCoverLetter(
   jobDescription: string,
   userProfile: UserProfile,
