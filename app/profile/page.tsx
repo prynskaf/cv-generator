@@ -514,11 +514,12 @@ export default function ProfilePage() {
         body: formData,
       })
 
-      const result = await response.json()
-
       if (!response.ok) {
+        const result = await response.json().catch(() => ({ error: 'Upload failed' }))
         throw new Error(result.error || 'Upload failed')
       }
+
+      const result = await response.json()
 
       setMessage({ type: 'success', text: 'CV uploaded and profile auto-filled successfully! Refreshing...' })
       setUploadFile(null)
