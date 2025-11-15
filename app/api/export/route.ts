@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getTemplate } from '@/lib/templates'
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import chromium from '@sparticuz/chromium-min'
 
 export async function POST(request: NextRequest) {
   let browser
@@ -40,7 +40,9 @@ export async function POST(request: NextRequest) {
 
     browser = await puppeteer.launch({
       args: chromium.args,
-      executablePath: await chromium.executablePath(),
+      executablePath: await chromium.executablePath(
+        'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+      ),
       headless: true,
     })
 
