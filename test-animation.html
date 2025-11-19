@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(to bottom right, #dbeafe, #f3e8ff, #ffffff);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      33% { transform: translateY(-30px) translateX(20px); }
+      66% { transform: translateY(-15px) translateX(-15px); }
+    }
+    
+    @keyframes float-delayed {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      33% { transform: translateY(25px) translateX(-25px); }
+      66% { transform: translateY(-20px) translateX(15px); }
+    }
+    
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      50% { transform: translateY(-40px) translateX(30px); }
+    }
+    
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+    }
+    
+    .orb1 {
+      top: 80px;
+      left: 40px;
+      width: 288px;
+      height: 288px;
+      background: rgba(96, 165, 250, 0.3);
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    .orb2 {
+      top: 160px;
+      right: 80px;
+      width: 384px;
+      height: 384px;
+      background: rgba(192, 132, 252, 0.3);
+      animation: float-delayed 25s ease-in-out infinite;
+      animation-delay: 2s;
+    }
+    
+    .orb3 {
+      bottom: 128px;
+      left: 33%;
+      width: 320px;
+      height: 320px;
+      background: rgba(129, 140, 248, 0.3);
+      animation: float-slow 30s ease-in-out infinite;
+      animation-delay: 4s;
+    }
+    
+    .content {
+      position: relative;
+      z-index: 10;
+      padding: 100px 20px;
+      text-align: center;
+      color: #1f2937;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  
+  <div class="content">
+    <h1>Animation Test</h1>
+    <p>You should see 3 floating colored orbs in the background</p>
+    <p>Blue (top-left), Purple (top-right), Indigo (bottom-center)</p>
+  </div>
+</body>
+</html>

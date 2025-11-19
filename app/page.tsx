@@ -7,7 +7,23 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-white relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Floating Orbs */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/30 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-400/30 rounded-full blur-3xl animate-float-delayed"></div>
+        <div className="absolute bottom-32 left-1/3 w-80 h-80 bg-indigo-400/30 rounded-full blur-3xl animate-float-slow"></div>
+        
+        {/* Subtle Grid Pattern */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-[0.05]"></div>
+        
+        {/* Glow Effect */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-96 bg-gradient-to-b from-blue-300/40 via-purple-300/30 to-transparent blur-3xl"></div>
+      </div>
+
+      {/* Content wrapper with relative positioning */}
+      <div className="relative z-10">
       {/* Modern Navigation */}
       <nav className="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -442,6 +458,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   )
 }
