@@ -8,7 +8,7 @@ export const designerStyles = StyleSheet.create({
     fontFamily: 'Helvetica',
   },
   header: {
-    backgroundColor: colors.designer.primary,
+    backgroundColor: '#db2777', // Pink-600 gradient start
     padding: 40,
     color: '#ffffff',
     flexDirection: 'row',

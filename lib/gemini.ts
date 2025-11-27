@@ -1,5 +1,7 @@
 import { GoogleGenAI } from "@google/genai"
 import * as mockAI from './mock-ai'
+import { optimizeCoverLetter, validateCoverLetter } from './coverLetterOptimizer'
+import { cleanCoverLetter } from './coverLetterCleaner'
 
 export interface JobAnalysis {
   keywords: string[]
@@ -52,6 +54,15 @@ export interface UserProfile {
     name: string
     description: string
     technologies: string[]
+  }>
+  certifications?: Array<{
+    name: string
+    issuing_organization: string
+    issue_date: string | null
+    expiry_date: string | null
+    credential_id?: string
+    credential_url?: string
+    description?: string
   }>
 }
 
@@ -146,17 +157,15 @@ Generate an optimized CV with the EXACT same JSON structure, but with enhanced, 
 
 **MANDATORY REQUIREMENTS:**
 
-1. **Experience Section - MUST GENERATE DETAILED BULLET POINTS:**
-   - For EACH work experience, create 4-6 bullet points with:
-     * Quantifiable achievements (numbers, percentages, metrics)
-     * Technical responsibilities using job description keywords
-     * Leadership and collaboration examples
-     * Problem-solving accomplishments
-     * Technologies and tools used
+1. **Experience Section - CONCISE BULLET POINTS:**
+   - For EACH work experience, create ONLY 1-3 bullet points (maximum 3)
+   - Each bullet point must be SHORT and CONCISE (one sentence, maximum 15-20 words)
+   - Focus on key achievements with quantifiable results (numbers, percentages)
    - Use action verbs: Led, Developed, Implemented, Optimized, Increased, Reduced
-   - Include specific metrics: "Improved performance by 40%", "Managed team of 5", "Reduced costs by $50k"
-   - EVEN IF the user's description is short or empty, YOU MUST generate realistic, detailed achievements based on their job title and company
+   - Include specific metrics: "Improved performance by 40%", "Reduced costs by $50k"
+   - Keep sentences brief and impactful - no long, complex sentences
    - Separate bullet points with \\n in the description field
+   - Example format: "Developed React components improving user engagement by 30%." (short, one sentence)
 
 2. **Education Section - ENHANCE:**
    - Add relevant coursework, honors, achievements
@@ -168,10 +177,16 @@ Generate an optimized CV with the EXACT same JSON structure, but with enhanced, 
    - Highlight years of experience and key skills
    - Include 2-3 major career achievements
 
-4. **Skills - CATEGORIZE:**
+4. **Skills - CRITICAL FILTERING:**
+   - ONLY include skills that:
+     * The user ACTUALLY HAS in their profile (check userProfile.skills array)
+     * Are RELEVANT to the job description (match job requirements)
+   - DO NOT add any skills the user doesn't have - only use skills from userProfile.skills
+   - Filter to show only skills that match or are closely related to job requirements
    - Group by category (Programming, Frameworks, Tools, etc.)
-   - Include skill_level and skill_category
-   - Prioritize skills relevant to the job
+   - Include skill_level and skill_category from the user's original skills
+   - Prioritize skills that are both in user's profile AND mentioned in job description
+   - If a skill is in job description but NOT in user's profile, DO NOT include it
 
 **EXAMPLE EXPERIENCE OUTPUT:**
 {
@@ -188,10 +203,19 @@ Generate an optimized CV with the EXACT same JSON structure, but with enhanced, 
   ]
 }
 
+5. **Projects - SHORT DESCRIPTIONS:**
+   - Keep project descriptions to ONE LINE only (maximum 15-20 words)
+   - Be concise and impactful - no long paragraphs
+   - Focus on what was built and key technology used
+   - Example: "Built AI-powered email assistant using React and OpenAI API." (short, one line)
+
 **IMPORTANT:**
-- Return COMPLETE JSON with ALL fields: full_name, email, phone, location, summary, experiences, education, skills, languages, projects, links
+- Return COMPLETE JSON with ALL fields: full_name, email, phone, location, summary, experiences, education, skills, languages, projects, certifications, links
 - DO NOT remove existing data, only enhance it
-- For experiences/education, put multiple bullet points in "description" field separated by \\n
+- For experiences/education, put 1-3 bullet points in "description" field separated by \\n (each bullet is one short sentence)
+- For projects, keep description to one short line
+- Skills: ONLY include skills from userProfile.skills that match the job description
+- Include certifications if the user has any - these are important credentials that should be highlighted
 - Be specific, quantifiable, and realistic based on the candidate's actual background
 - Use job description keywords naturally throughout
 
@@ -214,6 +238,12 @@ export async function generateCoverLetter(
   jobTitle: string,
   companyName: string
 ): Promise<string> {
+  const certificationsText = userProfile.certifications && userProfile.certifications.length > 0
+    ? `Certifications: ${userProfile.certifications.map(cert => 
+        `${cert.name} from ${cert.issuing_organization}${cert.issue_date ? ` (${cert.issue_date})` : ''}`
+      ).join(', ')}`
+    : ''
+
   const profileDetails = `
 Name: ${userProfile.full_name}
 Email: ${userProfile.email}
@@ -223,12 +253,13 @@ Skills: ${userProfile.skills.map(s => s.skill_name).join(', ')}
 Recent Experience: ${userProfile.experiences[0]?.position} at ${userProfile.experiences[0]?.company}
 ${userProfile.languages && userProfile.languages.length > 0 ? `Languages: ${userProfile.languages.map(l => `${l.name} (${l.proficiency})`).join(', ')}` : ''}
 ${userProfile.projects && userProfile.projects.length > 0 ? `Notable Projects: ${userProfile.projects.map(p => p.name).join(', ')}` : ''}
+${certificationsText}
 ${userProfile.links?.linkedin ? `LinkedIn: ${userProfile.links.linkedin}` : ''}
 ${userProfile.links?.github ? `GitHub: ${userProfile.links.github}` : ''}
 ${userProfile.links?.portfolio ? `Portfolio: ${userProfile.links.portfolio}` : ''}
   `.trim()
 
-  const prompt = `Write a professional cover letter for the following job application.
+  const prompt = `You are an expert cover letter writer. Write a professional, optimized cover letter for this job application.
 
 Job Title: ${jobTitle}
 Company: ${companyName}
@@ -243,23 +274,99 @@ Job Match Analysis:
 Match Percentage: ${analysis.match_percentage}%
 Key Skills Match: ${analysis.required_skills.join(', ')}
 
-Please write a compelling cover letter that:
-1. Shows enthusiasm for the role and company
-2. Highlights relevant experience and skills
-3. Addresses key job requirements
-4. Demonstrates value the candidate can bring
-5. Maintains a professional yet personable tone
-6. Is 3-4 paragraphs long
-7. If the candidate has relevant projects or languages, mention them when appropriate
-8. If portfolio/GitHub links are available, subtly reference online work when relevant
+CRITICAL REQUIREMENTS - FOLLOW THESE STRICTLY:
 
-Return just the cover letter text, no additional formatting or markdown.`
+1. **LENGTH & STRUCTURE:**
+   - Write exactly 3-4 paragraphs (no more, no less)
+   - Target 250-350 words total (be concise and impactful)
+   - Each paragraph should be 60-90 words
+   - Opening paragraph: Express interest and key value proposition
+   - Middle paragraph(s): Highlight relevant experience and achievements
+   - Closing paragraph: Reiterate enthusiasm and call to action
+
+2. **WORD OPTIMIZATION - AVOID REPETITION:**
+   - DO NOT repeat the same words or phrases multiple times
+   - Use varied vocabulary and synonyms throughout
+   - Avoid repeating job title, company name, or key skills more than once per paragraph
+   - Use different action verbs (led, developed, implemented, optimized, achieved, delivered, etc.)
+   - Vary sentence structure and length for readability
+
+3. **CONTENT REQUIREMENTS:**
+   - Show genuine enthusiasm for the role and company (mention specific company values/mission if known)
+   - Highlight 2-3 most relevant experiences with quantifiable achievements
+   - Address top 3-4 key job requirements from the job description
+   - Demonstrate unique value the candidate brings
+   - If candidate has relevant certifications, mention 1-2 most relevant ones naturally
+   - If candidate has notable projects, mention 1 most impressive project briefly
+   - If portfolio/GitHub available, subtly reference it once
+
+4. **TONE & STYLE:**
+   - Professional yet personable and authentic
+   - Confident but not arrogant
+   - Specific and concrete (use numbers/metrics when possible)
+   - Active voice preferred
+   - Clear and concise - every sentence should add value
+
+5. **QUALITY CHECKS:**
+   - No filler words or generic phrases
+   - No repetition of ideas or statements
+   - Each paragraph should have a distinct purpose
+   - Smooth transitions between paragraphs
+   - Strong opening hook and compelling closing
+
+EXAMPLE STRUCTURE:
+Paragraph 1 (60-80 words): Opening with enthusiasm, mention role, and key value proposition
+Paragraph 2 (80-100 words): Highlight relevant experience with specific achievements and metrics
+Paragraph 3 (80-100 words): Address job requirements and demonstrate fit
+Paragraph 4 (60-70 words): Closing with enthusiasm and call to action
+
+CRITICAL - DO NOT INCLUDE:
+- NO "Dear Hiring Manager," or any greeting
+- NO "Sincerely," or any closing
+- NO signature or name at the end
+- NO date, address, or contact information
+- NO headers or formatting
+
+Return ONLY the body paragraphs of the cover letter. Start directly with the first paragraph content. The letter will be formatted automatically with proper headers and signatures.`
 
   try {
-    return await callGemini(prompt)
+    let coverLetter = await callGemini(prompt)
+    
+    // Step 1: Comprehensive cleaning - remove all greetings, signatures, headers
+    coverLetter = cleanCoverLetter(coverLetter)
+    
+    // Step 2: Remove markdown formatting
+    coverLetter = coverLetter.replace(/^#+\s*/gm, '').replace(/\*\*/g, '').replace(/\*/g, '')
+    
+    // Step 3: Optimize the cover letter (length, duplicates, etc.)
+    coverLetter = optimizeCoverLetter(coverLetter, {
+      maxWords: 350,
+      minWords: 200,
+      maxParagraphs: 4,
+      removeDuplicates: true,
+    })
+    
+    // Step 4: Final cleaning pass to ensure no greetings/signatures slipped through
+    coverLetter = cleanCoverLetter(coverLetter)
+    
+    // Step 5: Validate and log issues
+    const validation = validateCoverLetter(coverLetter)
+    if (!validation.isValid) {
+      console.warn('Cover letter validation issues:', validation.issues)
+    }
+    
+    return coverLetter
   } catch (error) {
     console.log('Gemini unavailable, using mock AI')
-    return mockAI.generateCoverLetter(jobDescription, userProfile, analysis, jobTitle, companyName)
+    let mockLetter = await mockAI.generateCoverLetter(jobDescription, userProfile, analysis, jobTitle, companyName)
+    // Clean and optimize mock letter too
+    mockLetter = cleanCoverLetter(mockLetter)
+    return optimizeCoverLetter(mockLetter, {
+      maxWords: 350,
+      minWords: 200,
+      maxParagraphs: 4,
+      removeDuplicates: true,
+    })
   }
 }
 

@@ -59,7 +59,7 @@ export default function CVBuilderModal({ isOpen, onClose, onComplete }: CVBuilde
     }
 
     // Load all user data
-    const [profileRes, expRes, eduRes, skillsRes, linksRes, langRes, projRes] = await Promise.all([
+    const [profileRes, expRes, eduRes, skillsRes, linksRes, langRes, projRes, certRes] = await Promise.all([
       supabase.from('user_profiles').select('*').eq('id', user.id).single(),
       supabase.from('experiences').select('*').eq('user_id', user.id).order('start_date', { ascending: false }),
       supabase.from('education').select('*').eq('user_id', user.id).order('start_date', { ascending: false }),
@@ -67,6 +67,7 @@ export default function CVBuilderModal({ isOpen, onClose, onComplete }: CVBuilde
       supabase.from('links').select('*').eq('user_id', user.id).single(),
       supabase.from('languages').select('*').eq('user_id', user.id),
       supabase.from('projects').select('*').eq('user_id', user.id),
+      supabase.from('certifications').select('*').eq('user_id', user.id).order('issue_date', { ascending: false }),
     ])
 
     const profile = profileRes.data
@@ -76,6 +77,7 @@ export default function CVBuilderModal({ isOpen, onClose, onComplete }: CVBuilde
     const links = linksRes.data || { linkedin: '', github: '', portfolio: '' }
     const languages = langRes.data || []
     const projects = projRes.data || []
+    const certifications = certRes.data || []
 
     // Always set preview data, even if profile is empty
     const cvData: CVData = {
@@ -118,6 +120,15 @@ export default function CVBuilderModal({ isOpen, onClose, onComplete }: CVBuilde
       languages: languages.map(lang => ({
         name: lang.name,
         proficiency: lang.proficiency || '',
+      })),
+      certifications: certifications.map((cert: any) => ({
+        name: cert.name,
+        issuing_organization: cert.issuing_organization,
+        issue_date: cert.issue_date,
+        expiry_date: cert.expiry_date,
+        credential_id: cert.credential_id,
+        credential_url: cert.credential_url,
+        description: cert.description,
       })),
       links: {
         linkedin: links?.linkedin || '',

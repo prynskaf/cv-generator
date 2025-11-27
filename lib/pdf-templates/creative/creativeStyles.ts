@@ -8,7 +8,7 @@ export const creativeStyles = StyleSheet.create({
     fontFamily: 'Helvetica',
   },
   header: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#9333ea', // Purple-600 gradient start
     padding: 30,
     color: '#ffffff',
     flexDirection: 'row',

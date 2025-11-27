@@ -84,18 +84,14 @@ export async function generateCoverLetter(
   jobTitle: string,
   companyName: string
 ): Promise<string> {
-  return `Dear Hiring Manager,
-
-I am writing to express my strong interest in the ${jobTitle} position${companyName ? ` at ${companyName}` : ''}. With a ${analysis.match_percentage}% match to your requirements and proven expertise in ${analysis.required_skills.slice(0, 3).join(', ')}, I am confident I would be a valuable addition to your team.
+  // Return ONLY body paragraphs - no greetings, no signatures (these are added by the formatter)
+  return `I am writing to express my strong interest in the ${jobTitle} position${companyName ? ` at ${companyName}` : ''}. With a ${analysis.match_percentage}% match to your requirements and proven expertise in ${analysis.required_skills.slice(0, 3).join(', ')}, I am confident I would be a valuable addition to your team.
 
 In my current role as ${userProfile.experiences[0]?.position || 'a professional'} at ${userProfile.experiences[0]?.company || 'my current company'}, I have successfully ${analysis.responsibilities[0]?.toLowerCase() || 'delivered exceptional results'}. My experience aligns perfectly with your needs, particularly in areas such as ${analysis.keywords.slice(0, 3).join(', ')}.
 
 I am particularly excited about this opportunity because it allows me to leverage my skills in ${userProfile.skills.slice(0, 2).map(s => s.skill_name).join(' and ')} while contributing to ${companyName || 'your organization'}'s continued success. I am eager to bring my passion for excellence and proven track record to your team.
 
-Thank you for considering my application. I look forward to the opportunity to discuss how my background, skills, and enthusiasm can contribute to ${companyName || 'your organization'}'s goals.
-
-Sincerely,
-${userProfile.full_name}`
+Thank you for considering my application. I look forward to the opportunity to discuss how my background, skills, and enthusiasm can contribute to ${companyName || 'your organization'}'s goals.`
 }
 
 export interface ExtractedCVData {

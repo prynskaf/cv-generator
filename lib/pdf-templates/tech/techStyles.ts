@@ -8,7 +8,7 @@ export const techStyles = StyleSheet.create({
     fontFamily: 'Courier',
   },
   header: {
-    backgroundColor: colors.tech.primary,
+    backgroundColor: '#16a34a', // Green-600 gradient start
     padding: 30,
     color: '#ffffff',
     flexDirection: 'row',
@@ -19,11 +19,12 @@ export const techStyles = StyleSheet.create({
     marginBottom: 10,
   },
   profilePicture: {
-    width: 80,
-    height: 80,
-    borderRadius: 40, // Small circle
+    width: 90,
+    height: 90,
+    borderRadius: 4, // Square with tech border
     borderWidth: 3,
     borderColor: '#ffffff',
+    borderStyle: 'solid',
   },
   headerContent: {
     flex: 1,
@@ -153,11 +154,14 @@ export const techStyles = StyleSheet.create({
   },
   skill: {
     fontSize: 8,
-    backgroundColor: colors.tech.accent,
-    color: colors.tech.primary,
-    padding: '3 6',
-    borderRadius: 8,
+    backgroundColor: '#d1fae5', // Green-100
+    color: '#16a34a', // Green-600
+    padding: '4 8',
+    borderRadius: 6,
     fontFamily: 'Courier',
+    fontWeight: 'bold',
+    marginBottom: 4,
+    marginRight: 4,
   },
   projectItem: {
     marginBottom: 12,

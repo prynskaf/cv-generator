@@ -54,6 +54,18 @@ export interface Project {
   technologies?: string[]
 }
 
+export interface Certification {
+  id?: string
+  user_id?: string
+  name: string
+  issuing_organization: string
+  issue_date: string | null
+  expiry_date: string | null
+  credential_id?: string
+  credential_url?: string
+  description?: string
+}
+
 export interface UserProfile {
   id?: string
   full_name: string

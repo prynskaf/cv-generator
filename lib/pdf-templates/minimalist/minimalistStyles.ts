@@ -3,62 +3,69 @@ import { colors } from '../shared/styles'
 
 export const minimalistStyles = StyleSheet.create({
   page: {
-    padding: 45,
+    padding: 50, // Maximum whitespace
     backgroundColor: colors.minimalist.background,
     fontFamily: 'Helvetica',
   },
   header: {
-    marginBottom: 25,
-    paddingBottom: 15,
+    marginBottom: 30,
+    paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 15,
+    borderBottomColor: '#e5e7eb', // Very light gray
+    alignItems: 'center', // Centered
+    textAlign: 'center',
   },
   profilePictureContainer: {
     marginTop: 5,
   },
   profilePicture: {
-    width: 60,
-    height: 60,
-    borderRadius: 30, // Small circle
+    width: 70,
+    height: 70,
+    borderRadius: 35, // Small circle
     borderWidth: 1,
-    borderColor: '#e5e5e5',
+    borderColor: '#e5e7eb',
+    alignSelf: 'center',
+    marginBottom: 10,
   },
   name: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: colors.minimalist.primary,
-    marginBottom: 6,
-    flex: 1,
+    fontSize: 24,
+    fontWeight: 'normal', // Light weight
+    color: '#111827', // Gray-900
+    marginBottom: 8,
+    textAlign: 'center',
   },
   contactRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    marginTop: 6,
+    marginTop: 8,
     fontSize: 9,
-    color: colors.minimalist.light,
+    color: '#6b7280', // Gray-500
+    justifyContent: 'center',
   },
   separator: {
     color: colors.minimalist.light,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: colors.minimalist.primary,
-    marginTop: 20,
-    marginBottom: 10,
+    fontSize: 12,
+    fontWeight: 'normal', // Thin
+    color: '#9ca3af', // Gray-400
+    marginTop: 25,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 3,
+    textAlign: 'center',
   },
   sectionTitleFirst: {
     marginTop: 0,
   },
   summary: {
-    fontSize: 9,
-    color: colors.minimalist.text,
-    lineHeight: 1.5,
+    fontSize: 11,
+    color: '#4b5563', // Gray-600
+    lineHeight: 1.8,
     marginBottom: 5,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
   jobHeader: {
     marginBottom: 6,

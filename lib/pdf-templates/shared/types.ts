@@ -39,6 +39,15 @@ export interface CVData {
     description: string
     technologies?: string[]
   }>
+  certifications?: Array<{
+    name: string
+    issuing_organization: string
+    issue_date: string | null
+    expiry_date: string | null
+    credential_id?: string
+    credential_url?: string
+    description?: string
+  }>
   links?: {
     linkedin?: string
     github?: string
@@ -60,17 +69,43 @@ export function formatDate(dateStr: string | null | undefined): string {
 export function splitIntoBullets(text: string | null | undefined): string[] {
   if (!text || typeof text !== 'string') return []
   
-  const bulletPatterns = [/[•\-\*]\s+/g, /\n+/g]
-  let lines = [text.trim()]
+  let lines: string[] = []
   
-  for (const pattern of bulletPatterns) {
-    lines = lines.flatMap(line => {
-      if (!line || typeof line !== 'string') return []
-      return line.split(pattern).filter(l => l && typeof l === 'string' && l.trim().length > 0)
-    })
+  // First, split by newlines
+  const newlineSplit = text.split(/\r?\n/).filter(line => line.trim().length > 0)
+  
+  if (newlineSplit.length > 1) {
+    // If there are newlines, use them as separators
+    lines = newlineSplit
+  } else {
+    // If no newlines, try splitting by bullet characters first
+    const bulletSplit = text.split(/[•\-\*]\s+/).filter(line => line.trim().length > 0)
+    
+    if (bulletSplit.length > 1) {
+      lines = bulletSplit
+    } else {
+      // If no bullet characters, split by sentences (period followed by space or end of string)
+      // This handles cases like: "Sentence one. Sentence two. Sentence three."
+      lines = text.split(/\.\s+(?=[A-Z])|\.$/).filter(line => line.trim().length > 0)
+      
+      // Add period back to each sentence (except the last one if it already has it)
+      lines = lines.map((line, index) => {
+        const trimmed = line.trim()
+        // If it's not the last line and doesn't end with a period, add one
+        if (index < lines.length - 1 && !trimmed.endsWith('.')) {
+          return trimmed + '.'
+        }
+        return trimmed
+      })
+    }
   }
   
-  return lines.filter(line => line && typeof line === 'string' && line.trim().length > 0)
+  // Clean up each line - remove leading bullet characters and whitespace
+  lines = lines.map(line => {
+    return line.replace(/^[•\-\*]\s*/, '').trim()
+  }).filter(line => line.length > 0)
+  
+  return lines
 }
 
 export function groupSkillsByCategory(skills: CVData['skills']): Record<string, string[]> {
@@ -104,6 +139,7 @@ export function sanitizeCVData(data: any): CVData {
     skills: [],
     languages: [],
     projects: [],
+    certifications: [],
     links: {
       linkedin: '',
       github: '',
@@ -166,6 +202,20 @@ export function sanitizeCVData(data: any): CVData {
         name: proj.name || '',
         description: proj.description || '',
         technologies: Array.isArray(proj.technologies) ? proj.technologies : [],
+      }))
+  }
+
+  if (Array.isArray(data?.certifications)) {
+    sanitized.certifications = data.certifications
+      .filter((cert: any) => cert && cert.name && cert.issuing_organization)
+      .map((cert: any) => ({
+        name: cert.name || '',
+        issuing_organization: cert.issuing_organization || '',
+        issue_date: cert.issue_date || null,
+        expiry_date: cert.expiry_date || null,
+        credential_id: cert.credential_id || undefined,
+        credential_url: cert.credential_url || undefined,
+        description: cert.description || undefined,
       }))
   }
 

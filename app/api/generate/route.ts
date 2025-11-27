@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
       { data: links, error: linksError },
       { data: languages, error: languagesError },
       { data: projects, error: projectsError },
+      { data: certifications, error: certificationsError },
     ] = await Promise.all([
       supabase
         .from('experiences')
@@ -104,6 +105,11 @@ export async function POST(request: NextRequest) {
         .from('projects')
         .select('*')
         .eq('user_id', user.id),
+      supabase
+        .from('certifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('issue_date', { ascending: false }),
     ])
 
     // Log errors but don't fail - use empty arrays as fallback
@@ -113,6 +119,7 @@ export async function POST(request: NextRequest) {
     if (linksError && linksError.code !== 'PGRST116') console.error('Error fetching links:', linksError) // PGRST116 = no rows returned
     if (languagesError) console.error('Error fetching languages:', languagesError)
     if (projectsError) console.error('Error fetching projects:', projectsError)
+    if (certificationsError) console.error('Error fetching certifications:', certificationsError)
 
     const userProfile: UserProfile = {
       full_name: profile.full_name,
@@ -126,18 +133,88 @@ export async function POST(request: NextRequest) {
       links: links || { linkedin: '', github: '', portfolio: '' },
       languages: languages || [],
       projects: projects || [],
-  
+      certifications: certifications || [],
     }
 
     const analysis = await analyzeJobDescription(job_description, userProfile)
     
     const tailoredCV = await generateTailoredCV(job_description, userProfile, analysis)
     
-    // Add profile picture URL and show flag to CV data
+    // Post-process: Filter skills to only include user's actual skills that match job description
+    const userSkillNames = new Set((skills || []).map(s => s.skill_name.toLowerCase().trim()))
+    const jobSkillsLower = analysis.required_skills.map(s => s.toLowerCase().trim())
+    
+    const filteredSkills = (tailoredCV.skills || []).filter(skill => {
+      const skillNameLower = skill.skill_name?.toLowerCase().trim() || ''
+      // Only include if:
+      // 1. User actually has this skill, OR
+      // 2. It's a close match to a user skill (fuzzy match)
+      const hasExactMatch = userSkillNames.has(skillNameLower)
+      const hasFuzzyMatch = Array.from(userSkillNames).some(userSkill => 
+        skillNameLower.includes(userSkill) || userSkill.includes(skillNameLower)
+      )
+      const isJobRelevant = jobSkillsLower.some(jobSkill => 
+        skillNameLower.includes(jobSkill) || jobSkill.includes(skillNameLower)
+      )
+      
+      return (hasExactMatch || hasFuzzyMatch) && isJobRelevant
+    })
+    
+    // Post-process: Limit experience bullet points to 1-3 and shorten sentences
+    const processedExperiences = (tailoredCV.experiences || []).map(exp => {
+      if (!exp.description) return exp
+      
+      const bullets = exp.description.split('\n').filter(b => b.trim().length > 0)
+      // Limit to 3 bullets max
+      const limitedBullets = bullets.slice(0, 3)
+      // Shorten each bullet (max 20 words)
+      const shortenedBullets = limitedBullets.map(bullet => {
+        const words = bullet.trim().split(/\s+/)
+        if (words.length > 20) {
+          return words.slice(0, 20).join(' ') + (bullet.endsWith('.') ? '' : '.')
+        }
+        return bullet.trim() + (bullet.endsWith('.') ? '' : '.')
+      })
+      
+      return {
+        ...exp,
+        description: shortenedBullets.join('\n')
+      }
+    })
+    
+    // Post-process: Shorten project descriptions to one line
+    const processedProjects = (tailoredCV.projects || []).map(project => {
+      if (!project.description) return project
+      
+      const words = project.description.trim().split(/\s+/)
+      // Limit to 20 words max (one line)
+      const shortened = words.length > 20 
+        ? words.slice(0, 20).join(' ') + (project.description.endsWith('.') ? '' : '.')
+        : project.description.trim() + (project.description.endsWith('.') ? '' : '.')
+      
+      return {
+        ...project,
+        description: shortened
+      }
+    })
+    
+    // Add profile picture URL, show flag, and certifications to CV data
     const cvWithPicture = {
       ...tailoredCV,
+      skills: filteredSkills,
+      experiences: processedExperiences,
+      projects: processedProjects,
       profile_picture_url: profile.profile_picture_url || undefined,
       show_profile_picture: show_profile_picture !== undefined ? show_profile_picture : true,
+      certifications: certifications?.map(cert => ({
+        name: cert.name,
+        issuing_organization: cert.issuing_organization,
+        issue_date: cert.issue_date,
+        expiry_date: cert.expiry_date,
+        credential_id: cert.credential_id,
+        credential_url: cert.credential_url,
+        description: cert.description,
+      })) || [],
     }
     
     const coverLetter = await generateCoverLetter(

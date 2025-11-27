@@ -9,9 +9,9 @@ export function MinimalistTemplate({ data }: { data: CVData }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header */}
+        {/* Header - Centered */}
         <View style={styles.header}>
-          {/* Profile Picture - Small circle, subtle placement */}
+          {/* Profile Picture - Small circle, centered */}
           {data.show_profile_picture !== false && data.profile_picture_url && (
             <View style={styles.profilePictureContainer}>
               <Image
@@ -68,7 +68,7 @@ export function MinimalistTemplate({ data }: { data: CVData }) {
                   </View>
                   {bullets.map((bullet, idx) => (
                     <Text key={idx} style={styles.bullet}>
-                      - {bullet}
+                      — {bullet}
                     </Text>
                   ))}
                 </View>
@@ -160,6 +160,29 @@ export function MinimalistTemplate({ data }: { data: CVData }) {
                       </React.Fragment>
                     ))}
                   </View>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Certifications */}
+        {data.certifications && data.certifications.length > 0 && (
+          <View>
+            <Text style={styles.sectionTitle}>Certifications</Text>
+            {data.certifications.map((cert, index) => (
+              <View key={index} style={{ marginBottom: 10 }}>
+                <Text style={styles.jobTitle}>{cert.name}</Text>
+                <Text style={styles.company}>{cert.issuing_organization}</Text>
+                {(cert.issue_date || cert.expiry_date) && (
+                  <Text style={styles.date}>
+                    {cert.issue_date ? formatDate(cert.issue_date) : ''}
+                    {cert.issue_date && cert.expiry_date ? ' - ' : ''}
+                    {cert.expiry_date ? formatDate(cert.expiry_date) : ''}
+                  </Text>
+                )}
+                {cert.credential_id && (
+                  <Text style={styles.description}>ID: {cert.credential_id}</Text>
                 )}
               </View>
             ))}

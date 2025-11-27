@@ -32,7 +32,7 @@ export function ExecutiveTemplate({ data }: { data: CVData }) {
         {/* Executive Summary */}
         {data.summary && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Executive Summary</Text>
+            <Text style={[styles.sectionTitle, { marginTop: 0 }]}>EXECUTIVE SUMMARY</Text>
             <Text style={styles.summary}>{data.summary}</Text>
           </View>
         )}
@@ -110,6 +110,29 @@ export function ExecutiveTemplate({ data }: { data: CVData }) {
               <View key={idx} style={styles.languageItem}>
                 <Text style={styles.languageName}>{lang.name}</Text>
                 <Text style={styles.proficiency}>{lang.proficiency}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Certifications */}
+        {data.certifications && data.certifications.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Professional Certifications</Text>
+            {data.certifications.map((cert, idx) => (
+              <View key={idx} style={styles.educationItem}>
+                <Text style={styles.degree}>{cert.name}</Text>
+                <Text style={styles.institution}>{cert.issuing_organization}</Text>
+                {(cert.issue_date || cert.expiry_date) && (
+                  <Text style={styles.date}>
+                    {cert.issue_date ? formatDate(cert.issue_date) : ''}
+                    {cert.issue_date && cert.expiry_date ? ' - ' : ''}
+                    {cert.expiry_date ? formatDate(cert.expiry_date) : ''}
+                  </Text>
+                )}
+                {cert.credential_id && (
+                  <Text style={styles.date}>Credential ID: {cert.credential_id}</Text>
+                )}
               </View>
             ))}
           </View>

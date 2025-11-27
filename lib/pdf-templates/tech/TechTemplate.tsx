@@ -137,6 +137,28 @@ export function TechTemplate({ data }: { data: CVData }) {
                 ))}
               </View>
             )}
+
+            {data.certifications && data.certifications.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Certifications</Text>
+                {data.certifications.map((cert, idx) => (
+                  <View key={idx} style={styles.projectItem}>
+                    <Text style={styles.projectName}>{cert.name}</Text>
+                    <Text style={styles.projectDesc}>{cert.issuing_organization}</Text>
+                    {(cert.issue_date || cert.expiry_date) && (
+                      <Text style={styles.technologies}>
+                        {cert.issue_date ? formatDate(cert.issue_date) : ''}
+                        {cert.issue_date && cert.expiry_date ? ' - ' : ''}
+                        {cert.expiry_date ? formatDate(cert.expiry_date) : ''}
+                      </Text>
+                    )}
+                    {cert.credential_id && (
+                      <Text style={styles.technologies}>ID: {cert.credential_id}</Text>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         </View>
       </Page>

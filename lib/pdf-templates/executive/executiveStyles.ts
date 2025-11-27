@@ -3,15 +3,15 @@ import { colors } from '../shared/styles'
 
 export const executiveStyles = StyleSheet.create({
   page: {
-    padding: 40,
+    padding: 50, // Premium spacing
     backgroundColor: colors.executive.background,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Times-Roman', // Serif for sophistication
   },
   header: {
+    backgroundColor: '#0f172a', // Dark slate-900
+    color: '#ffffff',
+    padding: 30,
     marginBottom: 25,
-    paddingBottom: 20,
-    borderBottomWidth: 3,
-    borderBottomColor: colors.executive.primary,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -23,40 +23,40 @@ export const executiveStyles = StyleSheet.create({
     marginLeft: 20,
   },
   profilePicture: {
-    width: 70,
-    height: 70,
-    borderRadius: 35, // Small circle, grayscale optional
+    width: 100,
+    height: 100,
+    borderRadius: 4, // Square with subtle border
     borderWidth: 2,
-    borderColor: colors.executive.primary,
+    borderColor: '#ffffff',
   },
   name: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: colors.executive.primary,
+    color: '#ffffff', // White on dark header
     marginBottom: 8,
     letterSpacing: 1,
-    textTransform: 'uppercase',
   },
   contactRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
     fontSize: 9,
-    color: colors.executive.text,
+    color: '#e2e8f0', // Light text on dark header
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 25, // Premium spacing
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: colors.executive.primary,
-    marginBottom: 12,
+    color: '#334155', // Slate-700
+    marginBottom: 15,
     textTransform: 'uppercase',
     letterSpacing: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.executive.accent,
-    paddingBottom: 4,
+    borderTopWidth: 2,
+    borderTopColor: '#334155',
+    paddingTop: 8,
+    marginTop: 20,
   },
   summary: {
     fontSize: 10,

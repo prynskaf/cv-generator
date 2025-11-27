@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 interface JobDetailsModalProps {
   isOpen: boolean
@@ -14,8 +15,21 @@ export default function JobDetailsModal({ isOpen, onClose, onSubmit }: JobDetail
   const [jobDescription, setJobDescription] = useState('')
   const [showProfilePicture, setShowProfilePicture] = useState(true)
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     if (!jobTitle || !jobDescription) {
       alert('Please fill in job title and description')
       return
@@ -28,19 +42,31 @@ export default function JobDetailsModal({ isOpen, onClose, onSubmit }: JobDetail
     setShowProfilePicture(true)
   }
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }
+
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] overflow-y-auto"
+      onClick={handleBackdropClick}
+    >
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          className="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity z-[9998]"
           onClick={onClose}
         />
 
         {/* Modal */}
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+        <div 
+          className="relative z-[10000] inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="bg-white">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
@@ -132,5 +158,12 @@ export default function JobDetailsModal({ isOpen, onClose, onSubmit }: JobDetail
       </div>
     </div>
   )
+
+  // Render modal using portal to document.body to avoid z-index issues
+  if (typeof window !== 'undefined') {
+    return createPortal(modalContent, document.body)
+  }
+  
+  return modalContent
 }
 

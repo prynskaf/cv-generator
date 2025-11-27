@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('Missing document_id', 'Please provide a document ID.')
     }
 
+    // Fetch document with cache busting to ensure latest data
     const { data: document, error: docError } = await supabase
       .from('generated_documents')
       .select('*')
@@ -55,10 +56,28 @@ export async function POST(request: NextRequest) {
       throw new NotFoundError('Document not found', 'The requested document was not found or you do not have access to it.')
     }
 
-    const cvContent = document.cv_content as CVData
-    const sanitizedData = sanitizeCVData(cvContent)
-    const fileName = `cv_${document.job_title.replace(/\s+/g, '_')}_${document.created_at}.pdf`
+    // Use the template_id from request if provided, otherwise use document's template
+    // This allows downloading with a different template than what's saved
     const selectedTemplate = template_id || document.template_id || 'modern'
+    
+    // Get CV content - use the template_id from request to determine which template to use
+    // But always use the latest saved cv_content from database
+    const cvContent = document.cv_content as CVData
+    
+    if (!cvContent) {
+      throw new ValidationError('Invalid CV content', 'The document does not contain valid CV content.')
+    }
+    
+    const sanitizedData = sanitizeCVData(cvContent)
+    const fileName = `cv_${document.job_title.replace(/\s+/g, '_')}_${Date.now()}.pdf`
+
+    console.log('Exporting CV:', {
+      documentId: document_id,
+      template: selectedTemplate,
+      hasExperiences: sanitizedData.experiences?.length || 0,
+      fullName: sanitizedData.full_name,
+      jobTitle: document.job_title,
+    })
 
     const pdfDoc = getTemplateComponent(selectedTemplate, sanitizedData)
     const blob = await pdf(pdfDoc).toBlob()
