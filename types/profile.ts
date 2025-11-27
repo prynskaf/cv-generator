@@ -65,16 +65,27 @@ export interface UserProfile {
   professional_summary?: string
 }
 
+import { CVData } from '@/lib/pdf-templates/shared/types'
+
+export interface JobAnalysis {
+  keywords: string[]
+  required_skills: string[]
+  responsibilities: string[]
+  missing_skills: string[]
+  match_percentage: number
+  suggestions: string[]
+}
+
 export interface GeneratedDocument {
   id: string
   user_id: string
   job_title: string
   company_name: string
   job_description: string
-  cv_content: any
+  cv_content: CVData
   cover_letter_content: string
   template_id: string
   pdf_url?: string
-  analysis?: any
+  analysis?: JobAnalysis
   created_at: string
 }

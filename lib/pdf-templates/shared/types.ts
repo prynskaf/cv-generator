@@ -4,6 +4,8 @@ export interface CVData {
   phone?: string
   location?: string
   summary?: string
+  profile_picture_url?: string
+  show_profile_picture?: boolean
   experiences?: Array<{
     company: string
     position: string
@@ -95,6 +97,8 @@ export function sanitizeCVData(data: any): CVData {
     phone: data?.phone || '',
     location: data?.location || '',
     summary: data?.summary || '',
+    profile_picture_url: data?.profile_picture_url || undefined,
+    show_profile_picture: data?.show_profile_picture !== undefined ? data.show_profile_picture : true,
     experiences: [],
     education: [],
     skills: [],

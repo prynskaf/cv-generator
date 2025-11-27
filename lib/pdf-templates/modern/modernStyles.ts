@@ -11,12 +11,26 @@ export const modernStyles = StyleSheet.create({
     backgroundColor: colors.modern.primary,
     padding: 30,
     color: '#ffffff',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 20,
+  },
+  profilePictureContainer: {
+    marginBottom: 10,
+  },
+  profilePicture: {
+    width: 100,
+    height: 100,
+    borderRadius: 50, // Circle
+    borderWidth: 3,
+    borderColor: '#ffffff',
   },
   name: {
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 8,
     color: '#ffffff',
+    flex: 1,
   },
   tagline: {
     fontSize: 14,

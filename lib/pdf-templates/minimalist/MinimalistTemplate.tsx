@@ -1,5 +1,5 @@
 import React from 'react'
-import { Document, Page, Text, View } from '@react-pdf/renderer'
+import { Document, Page, Text, View, Image } from '@react-pdf/renderer'
 import { CVData, formatDate, splitIntoBullets, groupSkillsByCategory } from '../shared/types'
 import { minimalistStyles as styles } from './minimalistStyles'
 
@@ -11,6 +11,15 @@ export function MinimalistTemplate({ data }: { data: CVData }) {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
+          {/* Profile Picture - Small circle, subtle placement */}
+          {data.show_profile_picture !== false && data.profile_picture_url && (
+            <View style={styles.profilePictureContainer}>
+              <Image
+                src={data.profile_picture_url}
+                style={styles.profilePicture}
+              />
+            </View>
+          )}
           <Text style={styles.name}>{data.full_name || 'Your Name'}</Text>
           <View style={styles.contactRow}>
             {data.email && <Text>{data.email}</Text>}

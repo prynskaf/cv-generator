@@ -5,18 +5,27 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { generateCoverLetterDocx, generateCoverLetterTxt } from '@/lib/coverLetterGenerator'
+import { CVData } from '@/lib/pdf-templates/shared/types'
+import { JobAnalysis } from '@/lib/gemini'
 
 interface GeneratedDocument {
   id: string
   job_title: string
   company_name: string | null
   job_description: string
-  cv_content: any
+  cv_content: CVData
   cover_letter_content: string
   template_id: string
   pdf_url: string | null
-  analysis: any
+  analysis: JobAnalysis | null
   created_at: string
+}
+
+interface GeneratedDocResponse {
+  document_id: string
+  analysis: JobAnalysis
+  cv_content: CVData
+  cover_letter: string
 }
 
 export default function DashboardPage() {
@@ -28,9 +37,10 @@ export default function DashboardPage() {
   const [jobTitle, setJobTitle] = useState('')
   const [companyName, setCompanyName] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState('modern')
+  const [showProfilePicture, setShowProfilePicture] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [generatedDoc, setGeneratedDoc] = useState<any>(null)
+  const [generatedDoc, setGeneratedDoc] = useState<GeneratedDocResponse | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   
@@ -78,23 +88,27 @@ export default function DashboardPage() {
           job_description: jobDescription,
           job_title: jobTitle,
           company_name: companyName,
+          show_profile_picture: showProfilePicture,
         }),
       })
 
-      const data = await response.json()
+      const responseData = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Generation failed')
+        throw new Error(responseData.error || 'Generation failed')
       }
 
-      setGeneratedDoc(data)
+      // Handle new standardized response format: { success: true, data: {...} }
+      const docData = responseData.data || responseData
+      setGeneratedDoc(docData)
       await loadDocuments()
       setShowForm(false)
       setJobDescription('')
       setJobTitle('')
       setCompanyName('')
-    } catch (err: any) {
-      setError(err.message)
+      setShowProfilePicture(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Generation failed')
     } finally {
       setGenerating(false)
     }
@@ -130,8 +144,8 @@ export default function DashboardPage() {
       window.URL.revokeObjectURL(url)
 
       await loadDocuments()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Export failed')
     } finally {
       setExporting(null)
     }
@@ -293,16 +307,18 @@ export default function DashboardPage() {
                   </svg>
                   <h3 className="text-lg font-semibold text-green-900">CV Generated Successfully!</h3>
                 </div>
-                <p className="text-green-700 mb-3">
-                  Match Score: <span className="font-bold text-2xl">{generatedDoc.analysis.match_percentage}%</span>
-                </p>
+                {generatedDoc.analysis && (
+                  <p className="text-green-700 mb-3">
+                    Match Score: <span className="font-bold text-2xl">{generatedDoc.analysis.match_percentage}%</span>
+                  </p>
+                )}
                 <div className="flex flex-wrap gap-2">
                   <button
-                    onClick={() => handleExport(generatedDoc.document_id)}
-                    disabled={exporting === generatedDoc.document_id}
+                    onClick={() => generatedDoc?.document_id && handleExport(generatedDoc.document_id)}
+                    disabled={!generatedDoc?.document_id || exporting === generatedDoc.document_id}
                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition shadow-md"
                   >
-                    {exporting === generatedDoc.document_id ? 'Exporting...' : 'Download CV'}
+                    {exporting === generatedDoc?.document_id ? 'Exporting...' : 'Download CV'}
                   </button>
                   <button
                     onClick={() => setGeneratedDoc(null)}
@@ -316,21 +332,22 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Generate New CV Button/Form */}
+        {/* Generate New CV Button */}
         <div className="mb-8">
-          {!showForm ? (
-            <button
-              onClick={() => setShowForm(true)}
-              className="group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-xl hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Generate New CV
-              </span>
-            </button>
-          ) : (
+          <Link
+            href="/cv-builder"
+            className="group relative overflow-hidden inline-block px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-xl hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Generate New CV
+            </span>
+          </Link>
+
+          {/* Legacy Form (kept for backward compatibility) */}
+          {showForm && (
             <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Generate CV & Cover Letter</h2>
@@ -403,6 +420,21 @@ export default function DashboardPage() {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Profile Picture Toggle */}
+                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <input
+                    type="checkbox"
+                    id="showProfilePicture"
+                    checked={showProfilePicture}
+                    onChange={(e) => setShowProfilePicture(e.target.checked)}
+                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="showProfilePicture" className="flex-1 cursor-pointer">
+                    <span className="text-sm font-semibold text-gray-700">Show Profile Picture</span>
+                    <p className="text-xs text-gray-500 mt-1">Include your profile picture in the generated CV</p>
+                  </label>
                 </div>
 
                 <button
@@ -540,6 +572,7 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
     </div>
   )
 }

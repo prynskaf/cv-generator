@@ -12,12 +12,26 @@ export const minimalistStyles = StyleSheet.create({
     paddingBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#e5e5e5',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 15,
+  },
+  profilePictureContainer: {
+    marginTop: 5,
+  },
+  profilePicture: {
+    width: 60,
+    height: 60,
+    borderRadius: 30, // Small circle
+    borderWidth: 1,
+    borderColor: '#e5e5e5',
   },
   name: {
     fontSize: 26,
     fontWeight: 'bold',
     color: colors.minimalist.primary,
     marginBottom: 6,
+    flex: 1,
   },
   contactRow: {
     flexDirection: 'row',

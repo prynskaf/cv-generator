@@ -1,5 +1,5 @@
 import React from 'react'
-import { Document, Page, Text, View } from '@react-pdf/renderer'
+import { Document, Page, Text, View, Image } from '@react-pdf/renderer'
 import { CVData, formatDate, splitIntoBullets, groupSkillsByCategory } from '../shared/types'
 import { professionalStyles as styles } from './professionalStyles'
 
@@ -11,7 +11,8 @@ export function ProfessionalTemplate({ data }: { data: CVData }) {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.name}>{data.full_name || 'YOUR NAME'}</Text>
+          <View style={styles.headerLeft}>
+            <Text style={styles.name}>{data.full_name || 'YOUR NAME'}</Text>
           <View style={styles.contactRow}>
             {data.email && <Text>{data.email}</Text>}
             {data.phone && <Text>|  {data.phone}</Text>}
@@ -34,6 +35,16 @@ export function ProfessionalTemplate({ data }: { data: CVData }) {
                   |  Portfolio: {data.links.portfolio.replace('https://', '').replace('http://', '')}
                 </Text>
               )}
+            </View>
+          )}
+          </View>
+          {/* Profile Picture - Rounded rectangle, right-aligned */}
+          {data.show_profile_picture !== false && data.profile_picture_url && (
+            <View style={styles.profilePictureContainer}>
+              <Image
+                src={data.profile_picture_url}
+                style={styles.profilePicture}
+              />
             </View>
           )}
         </View>

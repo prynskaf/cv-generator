@@ -9,10 +9,26 @@ export const professionalStyles = StyleSheet.create({
   },
   header: {
     marginBottom: 25,
-    textAlign: 'center',
     paddingBottom: 20,
     borderBottomWidth: 3,
     borderBottomColor: colors.professional.primary,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerLeft: {
+    flex: 1,
+    textAlign: 'left',
+  },
+  profilePictureContainer: {
+    marginLeft: 20,
+  },
+  profilePicture: {
+    width: 90,
+    height: 90,
+    borderRadius: 8, // Rounded rectangle
+    borderWidth: 2,
+    borderColor: colors.professional.primary,
   },
   name: {
     fontSize: 36,

@@ -18,14 +18,32 @@ export default function ContactPage() {
     setSubmitting(true)
     setStatus(null)
 
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
 
-    setStatus({
-      type: 'success',
-      message: 'Thank you for your message! We will get back to you soon.'
-    })
-    setFormData({ name: '', email: '', subject: '', message: '' })
-    setSubmitting(false)
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message')
+      }
+
+      setStatus({
+        type: 'success',
+        message: data.message || 'Thank you for your message! We will get back to you soon.'
+      })
+      setFormData({ name: '', email: '', subject: '', message: '' })
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to send message. Please try again.'
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

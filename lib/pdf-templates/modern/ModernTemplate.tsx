@@ -1,5 +1,5 @@
 import React from 'react'
-import { Document, Page, Text, View } from '@react-pdf/renderer'
+import { Document, Page, Text, View, Image } from '@react-pdf/renderer'
 import { CVData, formatDate, splitIntoBullets, groupSkillsByCategory } from '../shared/types'
 import { modernStyles as styles } from './modernStyles'
 
@@ -11,6 +11,15 @@ export function ModernTemplate({ data }: { data: CVData }) {
       <Page size="A4" style={styles.page}>
         {/* Header Section */}
         <View style={styles.header}>
+          {/* Profile Picture - Circle, top-left/center, 80-120px */}
+          {data.show_profile_picture !== false && data.profile_picture_url && (
+            <View style={styles.profilePictureContainer}>
+              <Image
+                src={data.profile_picture_url}
+                style={styles.profilePicture}
+              />
+            </View>
+          )}
           <Text style={styles.name}>{data.full_name || 'Your Name'}</Text>
           {data.summary && (
             <Text style={styles.tagline}>
