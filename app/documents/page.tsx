@@ -14,6 +14,7 @@ export default function DocumentsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterTemplate, setFilterTemplate] = useState<string>('all')
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'match'>('newest')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const supabase = createClient()
   const router = useRouter()
@@ -185,7 +186,7 @@ export default function DocumentsPage() {
             </div>
 
             <button
-              onClick={() => {/* mobile menu */}}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-100"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,6 +194,35 @@ export default function DocumentsPage() {
               </svg>
             </button>
           </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden pb-4 space-y-2">
+              <Link
+                href="/dashboard"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/profile"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                My Profile
+              </Link>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  handleLogout()
+                }}
+                className="block w-full text-left px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </nav>
 
