@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { CVData, splitIntoBullets } from '@/lib/pdf-templates/shared/types'
 
 interface LivePreviewProps {
@@ -580,13 +581,13 @@ function ProfessionalPreview({ data }: { data: CVData }) {
   return (
     <div className="bg-white" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
       {/* Header with thick top border */}
-      <div className="border-t-4 border-gray-800 pb-5 pt-6 px-10">
+      <div className="border-t-4 border-gray-800 pb-3 pt-4 px-8">
         <div className="flex items-start justify-between">
           <div className="flex-1 pr-6">
-            <h1 className="text-2xl font-bold text-gray-900 uppercase tracking-wider mb-3" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.1em' }}>
+            <h1 className="text-xl font-bold text-gray-900 uppercase tracking-wide mb-2" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.05em' }}>
               {data.full_name || 'YOUR NAME'}
             </h1>
-            <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-2">
+            <div className="flex flex-wrap gap-1.5 text-xs text-gray-600 mb-1">
               {data.email && <span>{data.email}</span>}
               {data.phone && <span>| {data.phone}</span>}
               {data.location && <span>| {data.location}</span>}
@@ -610,7 +611,7 @@ function ProfessionalPreview({ data }: { data: CVData }) {
             <img
               src={data.profile_picture_url}
               alt="Profile"
-              className="w-20 h-20 rounded-full border-2 border-gray-800 object-cover flex-shrink-0"
+              className="w-16 h-16 rounded-full border-2 border-gray-800 object-cover flex-shrink-0"
             />
           )}
         </div>
@@ -623,10 +624,10 @@ function ProfessionalPreview({ data }: { data: CVData }) {
           {/* Professional Summary */}
           {data.summary && (
             <div className="mb-6">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 border-b-4 border-gray-800 pb-1 uppercase tracking-widest" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.15em' }}>
+              <h2 className="text-xs font-bold text-gray-900 mb-2 border-b-3 border-gray-800 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.08em' }}>
                 PROFESSIONAL SUMMARY
               </h2>
-              <p className="text-sm text-gray-700 leading-relaxed italic" style={{ fontFamily: 'Helvetica, Arial, sans-serif', textAlign: 'justify' }}>
+              <p className="text-xs text-gray-700 leading-snug italic" style={{ fontFamily: 'Helvetica, Arial, sans-serif', textAlign: 'justify' }}>
                 {data.summary}
               </p>
             </div>
@@ -635,18 +636,18 @@ function ProfessionalPreview({ data }: { data: CVData }) {
           {/* Professional Experience */}
           {data.experiences && data.experiences.length > 0 && (
             <div className="mb-6">
-              <h2 className="text-sm font-bold text-gray-900 mb-4 border-b-4 border-gray-800 pb-1 uppercase tracking-widest" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.15em' }}>
+              <h2 className="text-xs font-bold text-gray-900 mb-2 border-b-3 border-gray-800 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.08em' }}>
                 PROFESSIONAL EXPERIENCE
               </h2>
-              <div className="space-y-5">
+              <div className="space-y-3">
                 {data.experiences.map((exp, idx) => {
                   const bullets = splitIntoBullets(exp.description)
                   return (
-                    <div key={idx} className="mb-5">
-                      <div className="flex justify-between items-start mb-2">
+                    <div key={idx} className="mb-3">
+                      <div className="flex justify-between items-start mb-1">
                         <div className="flex-1 pr-4">
-                          <h3 className="font-bold text-gray-900 mb-1" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{exp.position}</h3>
-                          <p className="text-sm text-gray-700">{exp.company}, {exp.location}</p>
+                          <h3 className="text-sm font-bold text-gray-900 mb-0.5" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{exp.position}</h3>
+                          <p className="text-xs text-gray-700">{exp.company}, {exp.location}</p>
                         </div>
                         {/* Date - Right-aligned */}
                         <span className="text-xs text-gray-500 italic whitespace-nowrap">
@@ -654,18 +655,18 @@ function ProfessionalPreview({ data }: { data: CVData }) {
                         </span>
                       </div>
                       {bullets.length > 0 ? (
-                        <ul className="mt-2 space-y-1.5 text-sm text-gray-700">
+                        <ul className="mt-1 space-y-0.5 text-xs text-gray-700">
                           {bullets.map((bullet, i) => (
-                            <li key={i} className="flex items-start" style={{ marginLeft: '18px' }}>
-                              <span className="mr-2">•</span>
+                            <li key={i} className="flex items-start" style={{ marginLeft: '15px' }}>
+                              <span className="mr-1.5">•</span>
                               <span>{bullet.trim()}</span>
                             </li>
                           ))}
                         </ul>
                       ) : (
-                        <ul className="mt-2 space-y-1.5 text-sm text-gray-700">
-                          <li className="flex items-start" style={{ marginLeft: '18px' }}>
-                            <span className="mr-2">•</span>
+                        <ul className="mt-1 space-y-0.5 text-xs text-gray-700">
+                          <li className="flex items-start" style={{ marginLeft: '15px' }}>
+                            <span className="mr-1.5">•</span>
                             <span>{exp.description}</span>
                           </li>
                         </ul>
@@ -679,49 +680,77 @@ function ProfessionalPreview({ data }: { data: CVData }) {
 
           {/* Education */}
           {data.education && data.education.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 border-b-4 border-gray-800 pb-1 uppercase tracking-widest" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.15em' }}>
+            <div className="mb-4">
+              <h2 className="text-xs font-bold text-gray-900 mb-2 border-b-3 border-gray-800 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.08em' }}>
                 EDUCATION
               </h2>
-              <div className="space-y-4">
-                {data.education.map((edu, idx) => (
-                  <div key={idx} className="mb-4">
-                    <div className="flex justify-between items-start mb-1">
-                      <div className="flex-1 pr-4">
-                        <h3 className="font-bold text-gray-900" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
-                          {edu.degree}, {edu.field_of_study}
-                        </h3>
-                        <p className="text-sm text-gray-700">{edu.institution}, {edu.location}</p>
+              <div className="space-y-3">
+                {data.education.map((edu, idx) => {
+                  const descriptionBullets = edu.description ? splitIntoBullets(edu.description) : []
+                  return (
+                    <div key={idx} className="mb-2">
+                      <div className="flex justify-between items-start mb-1">
+                        <div className="flex-1 pr-4">
+                          <h3 className="text-sm font-bold text-gray-900" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                            {edu.degree}, {edu.field_of_study}
+                          </h3>
+                          <p className="text-xs text-gray-700" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{edu.institution}, {edu.location}</p>
+                        </div>
+                        <span className="text-xs text-gray-500 italic whitespace-nowrap" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                          {formatDate(edu.start_date)} - {edu.is_current ? 'Present' : formatDate(edu.end_date || '')}
+                        </span>
                       </div>
-                      <span className="text-xs text-gray-500 italic whitespace-nowrap">
-                        {formatDate(edu.start_date)} - {edu.is_current ? 'Present' : formatDate(edu.end_date || '')}
-                      </span>
+                      {descriptionBullets.length > 0 ? (
+                        <ul className="list-none ml-4 mt-1 space-y-0.5">
+                          {descriptionBullets.map((bullet, bulletIdx) => (
+                            <li key={bulletIdx} className="text-xs text-gray-700" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                              • {bullet.trim()}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : edu.description ? (
+                        <p className="text-xs text-gray-700 mt-1 ml-4" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                          • {edu.description}
+                        </p>
+                      ) : null}
                     </div>
-                    {edu.description && (
-                      <p className="text-sm text-gray-700 mt-1">{edu.description}</p>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
 
           {/* Projects */}
           {data.projects && data.projects.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 border-b-4 border-gray-800 pb-1 uppercase tracking-widest" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.15em' }}>
+            <div className="mb-4">
+              <h2 className="text-xs font-bold text-gray-900 mb-2 border-b-3 border-gray-800 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.08em' }}>
                 PROJECTS
               </h2>
-              <div className="space-y-4">
-                {data.projects.map((project, idx) => (
-                  <div key={idx} className="mb-3">
-                    <h3 className="font-bold text-gray-900 mb-1" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{project.name}</h3>
-                    <p className="text-sm text-gray-700">{project.description}</p>
-                    {project.technologies && project.technologies.length > 0 && (
-                      <p className="text-sm text-gray-600 mt-1">Technologies: {project.technologies.join(', ')}</p>
-                    )}
-                  </div>
-                ))}
+              <div className="space-y-3">
+                {data.projects.map((project, idx) => {
+                  const descriptionBullets = project.description ? splitIntoBullets(project.description) : []
+                  return (
+                    <div key={idx} className="mb-2">
+                      <h3 className="text-sm font-bold text-gray-900 mb-0.5" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{project.name}</h3>
+                      {descriptionBullets.length > 0 ? (
+                        <ul className="list-none ml-4 mt-1 space-y-0.5">
+                          {descriptionBullets.map((bullet, bulletIdx) => (
+                            <li key={bulletIdx} className="text-xs text-gray-700" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                              • {bullet.trim()}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : project.description ? (
+                        <p className="text-xs text-gray-700 ml-4" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                          • {project.description}
+                        </p>
+                      ) : null}
+                      {project.technologies && project.technologies.length > 0 && (
+                        <p className="text-xs text-gray-600 mt-1" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Technologies: {project.technologies.join(', ')}</p>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -752,14 +781,14 @@ function ProfessionalPreview({ data }: { data: CVData }) {
         </div>
 
         {/* Right Sidebar - 35% */}
-        <div className="w-[35%] pl-8 border-l-4 border-gray-800">
+        <div className="w-[35%] pl-5 border-l-4 border-gray-800">
           {/* Technical Skills */}
           {data.skills && data.skills.length > 0 && (
             <div className="mb-6">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 border-b-4 border-gray-800 pb-1 uppercase tracking-widest" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.15em' }}>
+              <h2 className="text-xs font-bold text-gray-900 mb-2 border-b-3 border-gray-800 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.08em' }}>
                 TECHNICAL SKILLS
               </h2>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-gray-700" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-gray-700" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                 {data.skills.map((skill, idx) => (
                   <div key={idx} className="flex items-start">
                     <span className="mr-2">•</span>
@@ -772,14 +801,14 @@ function ProfessionalPreview({ data }: { data: CVData }) {
 
           {/* Languages */}
           {data.languages && data.languages.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 border-b-4 border-gray-800 pb-1 uppercase tracking-widest" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.15em' }}>
+            <div className="mb-4">
+              <h2 className="text-xs font-bold text-gray-900 mb-2 border-b-3 border-gray-800 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.08em' }}>
                 LANGUAGES
               </h2>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {data.languages.map((lang, idx) => (
-                  <div key={idx} className="text-sm text-gray-700">
-                    <span className="font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>{lang.name}</span> ({lang.proficiency})
+                  <div key={idx} className="text-xs text-gray-700" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                    <span className="font-bold text-gray-900" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{lang.name}</span> ({lang.proficiency})
                   </div>
                 ))}
               </div>
@@ -789,24 +818,24 @@ function ProfessionalPreview({ data }: { data: CVData }) {
           {/* Links */}
           {data.links && (data.links.linkedin || data.links.github || data.links.portfolio) && (
             <div>
-              <h2 className="text-sm font-bold text-gray-900 mb-3 border-b-4 border-gray-800 pb-1 uppercase tracking-widest" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.15em' }}>
+              <h2 className="text-xs font-bold text-gray-900 mb-2 border-b-3 border-gray-800 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.08em' }}>
                 LINKS
               </h2>
-              <div className="space-y-2 text-xs">
+              <div className="space-y-1.5 text-xs">
                 {data.links.linkedin && (
-                  <div className="text-gray-700">
+                  <div className="text-gray-700" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                     <span className="font-bold text-gray-900" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>LinkedIn: </span>
                     <span>{data.links.linkedin.replace(/^https?:\/\//, '').replace(/^www\./, '')}</span>
                   </div>
                 )}
                 {data.links.github && (
-                  <div className="text-gray-700">
+                  <div className="text-gray-700" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                     <span className="font-bold text-gray-900" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>GitHub: </span>
                     <span>{data.links.github.replace(/^https?:\/\//, '').replace(/^www\./, '')}</span>
                   </div>
                 )}
                 {data.links.portfolio && (
-                  <div className="text-gray-700">
+                  <div className="text-gray-700" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                     <span className="font-bold text-gray-900" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Portfolio: </span>
                     <span>{data.links.portfolio.replace(/^https?:\/\//, '').replace(/^www\./, '')}</span>
                   </div>
@@ -823,10 +852,29 @@ function ProfessionalPreview({ data }: { data: CVData }) {
 // Minimalist Preview Component
 function MinimalistPreview({ data }: { data: CVData }) {
   return (
-    <div className="space-y-6 text-center">
-      <div className="border-b border-gray-200 pb-6">
+    <div className="bg-white px-10 py-8" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+      {/* Header - Clean, left-aligned */}
+      <div className="border-b border-gray-200 pb-4 mb-5 flex justify-between items-start">
+        <div className="flex-1">
+          <h1 className="text-2xl font-normal text-gray-900 mb-2" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.02em' }}>
+            {data.full_name || 'Your Name'}
+          </h1>
+          <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+            {data.email && <span>{data.email}</span>}
+            {data.phone && <span className="text-gray-400">| {data.phone}</span>}
+            {data.location && <span className="text-gray-400">| {data.location}</span>}
+          </div>
+          {data.links && (data.links.linkedin || data.links.github || data.links.portfolio) && (
+            <div className="flex flex-wrap gap-2 mt-2 text-xs text-gray-500">
+              {data.links.linkedin && <span>{data.links.linkedin.replace(/^https?:\/\//, '').replace(/^www\./, '')}</span>}
+              {data.links.github && <span className="text-gray-400">| {data.links.github.replace(/^https?:\/\//, '').replace(/^www\./, '')}</span>}
+              {data.links.portfolio && <span className="text-gray-400">| {data.links.portfolio.replace(/^https?:\/\//, '').replace(/^www\./, '')}</span>}
+            </div>
+          )}
+        </div>
+        {/* Profile Picture - Small circle, top-right */}
         {data.show_profile_picture !== false && data.profile_picture_url && (
-          <div className="flex justify-center mb-4">
+          <div className="ml-4">
             <img
               src={data.profile_picture_url}
               alt="Profile"
@@ -834,32 +882,204 @@ function MinimalistPreview({ data }: { data: CVData }) {
             />
           </div>
         )}
-        <h1 className="text-2xl font-normal text-gray-900">{data.full_name || 'Your Name'}</h1>
-        <div className="flex flex-wrap gap-2 mt-2 text-xs text-gray-500 justify-center">
-          {data.email && <span>{data.email}</span>}
-          {data.phone && <span>| {data.phone}</span>}
-          {data.location && <span>| {data.location}</span>}
-        </div>
-        {data.links && (data.links.linkedin || data.links.github || data.links.portfolio) && (
-          <div className="flex flex-wrap gap-2 mt-2 text-xs text-gray-400 justify-center">
-            {data.links.linkedin && <span>{data.links.linkedin.replace(/^https?:\/\//, '')}</span>}
-            {data.links.github && <span>| {data.links.github.replace(/^https?:\/\//, '')}</span>}
-            {data.links.portfolio && <span>| {data.links.portfolio.replace(/^https?:\/\//, '')}</span>}
-          </div>
-        )}
       </div>
+
+      {/* Summary */}
       {data.summary && (
-        <div>
-          <h2 className="text-xs font-normal text-gray-400 mb-3 border-b border-gray-200 pb-1 uppercase tracking-widest">Summary</h2>
-          <p className="text-sm text-gray-600 leading-relaxed italic">{data.summary}</p>
+        <div className="mb-5">
+          <h2 className="text-xs font-normal text-gray-400 mb-2 border-b border-gray-100 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.1em' }}>
+            Summary
+          </h2>
+          <p className="text-xs text-gray-600 leading-relaxed" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{data.summary}</p>
         </div>
       )}
-      {renderExperiences(data.experiences, 'minimalist')}
-      {renderEducation(data.education, 'minimalist')}
-      {renderSkills(data.skills, 'minimalist')}
-      {renderProjects(data.projects, 'minimalist')}
-      {renderLanguages(data.languages, 'minimalist')}
-      {renderCertifications(data.certifications, 'minimalist')}
+
+      {/* Experience */}
+      {data.experiences && data.experiences.length > 0 && (
+        <div className="mb-5">
+          <h2 className="text-xs font-normal text-gray-400 mb-2 border-b border-gray-100 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.1em' }}>
+            Experience
+          </h2>
+          <div className="space-y-4">
+            {data.experiences.map((exp, idx) => {
+              const bullets = splitIntoBullets(exp.description)
+              return (
+                <div key={idx} className="mb-3">
+                  <div className="flex justify-between items-start mb-1">
+                    <div className="flex-1">
+                      <h3 className="text-sm font-normal text-gray-900 mb-0.5" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{exp.position}</h3>
+                      <p className="text-xs text-gray-500">{exp.company}, {exp.location}</p>
+                    </div>
+                    <span className="text-xs text-gray-400 italic whitespace-nowrap ml-4">
+                      {formatDate(exp.start_date)} - {exp.is_current ? 'Present' : formatDate(exp.end_date || '')}
+                    </span>
+                  </div>
+                  {bullets.length > 0 ? (
+                    <ul className="mt-1 space-y-0.5">
+                      {bullets.map((bullet, i) => (
+                        <li key={i} className="text-xs text-gray-600 ml-3" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                          • {bullet.trim()}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-xs text-gray-600 ml-3 mt-1" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                      • {exp.description}
+                    </p>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Education */}
+      {data.education && data.education.length > 0 && (
+        <div className="mb-5">
+          <h2 className="text-xs font-normal text-gray-400 mb-2 border-b border-gray-100 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.1em' }}>
+            Education
+          </h2>
+          <div className="space-y-3">
+            {data.education.map((edu, idx) => {
+              const descriptionBullets = edu.description ? splitIntoBullets(edu.description) : []
+              return (
+                <div key={idx} className="mb-2">
+                  <div className="flex justify-between items-start mb-1">
+                    <div className="flex-1">
+                      <h3 className="text-sm font-normal text-gray-900 mb-0.5" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                        {edu.degree}, {edu.field_of_study}
+                      </h3>
+                      <p className="text-xs text-gray-500">{edu.institution}, {edu.location}</p>
+                    </div>
+                    <span className="text-xs text-gray-400 italic whitespace-nowrap ml-4">
+                      {formatDate(edu.start_date)} - {edu.is_current ? 'Present' : formatDate(edu.end_date || '')}
+                    </span>
+                  </div>
+                  {descriptionBullets.length > 0 ? (
+                    <ul className="mt-1 space-y-0.5">
+                      {descriptionBullets.map((bullet, bulletIdx) => (
+                        <li key={bulletIdx} className="text-xs text-gray-600 ml-3" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                          • {bullet.trim()}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : edu.description ? (
+                    <p className="text-xs text-gray-600 ml-3 mt-1" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                      • {edu.description}
+                    </p>
+                  ) : null}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Skills */}
+      {data.skills && data.skills.length > 0 && (
+        <div className="mb-5">
+          <h2 className="text-xs font-normal text-gray-400 mb-2 border-b border-gray-100 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.1em' }}>
+            Skills
+          </h2>
+          <div className="flex flex-wrap gap-1 text-xs text-gray-600">
+            {data.skills?.map((skill, idx) => (
+              <React.Fragment key={idx}>
+                <span style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{skill.skill_name}</span>
+                {idx < (data.skills?.length ?? 0) - 1 && <span className="text-gray-300"> • </span>}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Projects */}
+      {data.projects && data.projects.length > 0 && (
+        <div className="mb-5">
+          <h2 className="text-xs font-normal text-gray-400 mb-2 border-b border-gray-100 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.1em' }}>
+            Projects
+          </h2>
+          <div className="space-y-3">
+            {data.projects.map((project, idx) => {
+              const descriptionBullets = project.description ? splitIntoBullets(project.description) : []
+              return (
+                <div key={idx} className="mb-2">
+                  <h3 className="text-sm font-normal text-gray-900 mb-0.5" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{project.name}</h3>
+                  {descriptionBullets.length > 0 ? (
+                    <ul className="mt-1 space-y-0.5">
+                      {descriptionBullets.map((bullet, bulletIdx) => (
+                        <li key={bulletIdx} className="text-xs text-gray-600 ml-3" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                          • {bullet.trim()}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : project.description ? (
+                    <p className="text-xs text-gray-600 ml-3 mt-1" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                      • {project.description}
+                    </p>
+                  ) : null}
+                  {project.technologies && project.technologies.length > 0 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Technologies: <span className="text-gray-600">{project.technologies.join(' • ')}</span>
+                    </p>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Certifications */}
+      {data.certifications && data.certifications.length > 0 && (
+        <div className="mb-5">
+          <h2 className="text-xs font-normal text-gray-400 mb-2 border-b border-gray-100 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.1em' }}>
+            Certifications
+          </h2>
+          <div className="space-y-3">
+            {data.certifications.map((cert, idx) => (
+              <div key={idx} className="mb-2">
+                <h3 className="text-sm font-normal text-gray-900 mb-0.5" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{cert.name}</h3>
+                <p className="text-xs text-gray-500">{cert.issuing_organization}</p>
+                {(cert.issue_date || cert.expiry_date) && (
+                  <p className="text-xs text-gray-400 italic">
+                    {cert.issue_date ? formatDate(cert.issue_date) : ''}
+                    {cert.issue_date && cert.expiry_date ? ' - ' : ''}
+                    {cert.expiry_date ? formatDate(cert.expiry_date) : ''}
+                  </p>
+                )}
+                {cert.credential_id && (
+                  <p className="text-xs text-gray-500 mt-0.5">ID: {cert.credential_id}</p>
+                )}
+                {cert.description && (
+                  <p className="text-xs text-gray-600 ml-3 mt-1">
+                    • {cert.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Languages */}
+      {data.languages && data.languages.length > 0 && (
+        <div className="mb-5">
+          <h2 className="text-xs font-normal text-gray-400 mb-2 border-b border-gray-100 pb-1 uppercase tracking-wide" style={{ fontFamily: 'Helvetica, Arial, sans-serif', letterSpacing: '0.1em' }}>
+            Languages
+          </h2>
+          <div className="flex flex-wrap gap-1 text-xs text-gray-600">
+            {data.languages?.map((lang, idx) => (
+              <React.Fragment key={idx}>
+                <span style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                  <span className="font-normal text-gray-900">{lang.name}</span> ({lang.proficiency})
+                </span>
+                {idx < (data.languages?.length ?? 0) - 1 && <span className="text-gray-300"> • </span>}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

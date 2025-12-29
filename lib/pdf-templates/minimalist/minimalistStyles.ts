@@ -3,136 +3,162 @@ import { colors } from '../shared/styles'
 
 export const minimalistStyles = StyleSheet.create({
   page: {
-    padding: 50, // Maximum whitespace
+    padding: 40,
     backgroundColor: colors.minimalist.background,
     fontFamily: 'Helvetica',
   },
+  // Header - Clean, left-aligned
   header: {
-    marginBottom: 30,
-    paddingBottom: 20,
+    marginBottom: 20,
+    paddingBottom: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb', // Very light gray
-    alignItems: 'center', // Centered
-    textAlign: 'center',
+    borderBottomColor: '#e5e7eb',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerLeft: {
+    flex: 1,
   },
   profilePictureContainer: {
-    marginTop: 5,
+    marginLeft: 15,
   },
   profilePicture: {
     width: 70,
     height: 70,
-    borderRadius: 35, // Small circle
+    borderRadius: 35,
     borderWidth: 1,
     borderColor: '#e5e7eb',
-    alignSelf: 'center',
-    marginBottom: 10,
   },
   name: {
-    fontSize: 24,
-    fontWeight: 'normal', // Light weight
-    color: '#111827', // Gray-900
-    marginBottom: 8,
-    textAlign: 'center',
+    fontSize: 26,
+    fontWeight: 'normal',
+    color: '#111827',
+    marginBottom: 6,
+    letterSpacing: 0.5,
   },
   contactRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 8,
+    gap: 8,
     fontSize: 9,
-    color: '#6b7280', // Gray-500
-    justifyContent: 'center',
+    color: '#6b7280',
+    marginTop: 4,
   },
   separator: {
-    color: colors.minimalist.light,
+    color: '#9ca3af',
   },
+  // Section Titles - Minimal, subtle
   sectionTitle: {
-    fontSize: 12,
-    fontWeight: 'normal', // Thin
-    color: '#9ca3af', // Gray-400
-    marginTop: 25,
-    marginBottom: 12,
+    fontSize: 11,
+    fontWeight: 'normal',
+    color: '#9ca3af',
+    marginTop: 18,
+    marginBottom: 10,
     textTransform: 'uppercase',
-    letterSpacing: 3,
-    textAlign: 'center',
+    letterSpacing: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+    paddingBottom: 4,
   },
   sectionTitleFirst: {
     marginTop: 0,
   },
   summary: {
-    fontSize: 11,
-    color: '#4b5563', // Gray-600
-    lineHeight: 1.8,
-    marginBottom: 5,
-    textAlign: 'center',
-    fontStyle: 'italic',
+    fontSize: 10,
+    color: '#4b5563',
+    lineHeight: 1.6,
+    marginBottom: 0,
+    textAlign: 'left',
   },
+  // Experience & Education
   jobHeader: {
     marginBottom: 6,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  jobHeaderLeft: {
+    flex: 1,
   },
   jobTitle: {
     fontSize: 11,
-    fontWeight: 'bold',
-    color: colors.minimalist.secondary,
+    fontWeight: 'normal',
+    color: '#111827',
+    marginBottom: 2,
   },
   company: {
     fontSize: 9,
-    color: colors.minimalist.text,
-    marginTop: 2,
+    color: '#6b7280',
+    marginTop: 1,
   },
   date: {
     fontSize: 8,
-    color: colors.minimalist.light,
-    marginTop: 2,
+    color: '#9ca3af',
+    marginTop: 0,
+    fontStyle: 'italic',
   },
   bullet: {
     fontSize: 9,
-    color: colors.minimalist.text,
+    color: '#4b5563',
     lineHeight: 1.5,
-    marginLeft: 10,
+    marginLeft: 12,
     marginBottom: 3,
   },
   description: {
     fontSize: 9,
-    color: colors.minimalist.text,
+    color: '#4b5563',
     lineHeight: 1.5,
-    marginTop: 5,
-    marginBottom: 10,
+    marginTop: 4,
+    marginBottom: 8,
   },
+  // Skills - Simple comma-separated
   skillsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 5,
+    gap: 4,
     marginTop: 6,
   },
   skill: {
-    fontSize: 8,
-    color: colors.minimalist.secondary,
-    padding: '4 0',
-    marginRight: 8,
+    fontSize: 9,
+    color: '#4b5563',
   },
-  skillDot: {
-    fontSize: 6,
-    color: colors.minimalist.light,
+  skillSeparator: {
+    fontSize: 8,
+    color: '#d1d5db',
+  },
+  // Languages
+  languagesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+    marginTop: 6,
   },
   languageItem: {
     fontSize: 9,
-    color: colors.minimalist.text,
-    marginBottom: 4,
+    color: '#4b5563',
   },
   languageName: {
-    fontWeight: 'bold',
-    color: colors.minimalist.secondary,
+    fontWeight: 'normal',
+    color: '#111827',
   },
+  // Projects & Certifications
+  projectItem: {
+    marginBottom: 10,
+  },
+  certificationItem: {
+    marginBottom: 10,
+  },
+  // Links
   link: {
-    fontSize: 8,
-    color: colors.minimalist.text,
+    fontSize: 9,
+    color: '#6b7280',
     marginBottom: 4,
   },
   categoryTitle: {
     fontSize: 9,
-    fontWeight: 'bold',
-    color: colors.minimalist.secondary,
+    fontWeight: 'normal',
+    color: '#6b7280',
     marginTop: 8,
     marginBottom: 4,
   },

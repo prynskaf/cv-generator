@@ -68,7 +68,7 @@ export function ProfessionalTemplate({ data }: { data: CVData }) {
                 {data.experiences.map((exp, index) => {
                   const bullets = splitIntoBullets(exp.description)
                   return (
-                    <View key={index} style={{ marginBottom: 18 }}>
+                    <View key={index} style={{ marginBottom: 10 }}>
                       <View style={styles.jobHeader}>
                         <View style={styles.jobHeaderLeft}>
                           <Text style={styles.jobTitle}>{exp.position}</Text>
@@ -102,24 +102,37 @@ export function ProfessionalTemplate({ data }: { data: CVData }) {
             {data.education && data.education.length > 0 && (
               <View>
                 <Text style={styles.sectionTitle}>EDUCATION</Text>
-                {data.education.map((edu, index) => (
-                  <View key={index} style={styles.educationItem}>
-                    <View style={styles.jobHeader}>
-                      <View style={styles.jobHeaderLeft}>
-                        <Text style={styles.jobTitle}>
-                          {edu.degree}, {edu.field_of_study}
-                        </Text>
-                        <Text style={styles.company}>
-                          {edu.institution}, {edu.location}
+                {data.education.map((edu, index) => {
+                  const descriptionBullets = edu.description ? splitIntoBullets(edu.description) : []
+                  return (
+                    <View key={index} style={styles.educationItem}>
+                      <View style={styles.jobHeader}>
+                        <View style={styles.jobHeaderLeft}>
+                          <Text style={styles.jobTitle}>
+                            {edu.degree}, {edu.field_of_study}
+                          </Text>
+                          <Text style={styles.company}>
+                            {edu.institution}, {edu.location}
+                          </Text>
+                        </View>
+                        <Text style={styles.date}>
+                          {formatDate(edu.start_date)} - {edu.is_current ? 'Present' : formatDate(edu.end_date || '')}
                         </Text>
                       </View>
-                      <Text style={styles.date}>
-                        {formatDate(edu.start_date)} - {edu.is_current ? 'Present' : formatDate(edu.end_date || '')}
-                      </Text>
+                      {descriptionBullets.length > 0 ? (
+                        descriptionBullets.map((bullet, idx) => (
+                          <Text key={idx} style={styles.bullet}>
+                            • {bullet.trim()}
+                          </Text>
+                        ))
+                      ) : edu.description ? (
+                        <Text style={styles.bullet}>
+                          • {edu.description}
+                        </Text>
+                      ) : null}
                     </View>
-                    {edu.description && <Text style={styles.description}>{edu.description}</Text>}
-                  </View>
-                ))}
+                  )
+                })}
               </View>
             )}
 
@@ -127,17 +140,30 @@ export function ProfessionalTemplate({ data }: { data: CVData }) {
             {data.projects && data.projects.length > 0 && (
               <View>
                 <Text style={styles.sectionTitle}>PROJECTS</Text>
-                {data.projects.map((project, index) => (
-                  <View key={index} style={styles.projectItem}>
-                    <Text style={styles.jobTitle}>{project.name}</Text>
-                    <Text style={styles.description}>{project.description}</Text>
-                    {project.technologies && project.technologies.length > 0 && (
-                      <Text style={styles.description}>
-                        Technologies: {project.technologies.join(', ')}
-                      </Text>
-                    )}
-                  </View>
-                ))}
+                {data.projects.map((project, index) => {
+                  const descriptionBullets = project.description ? splitIntoBullets(project.description) : []
+                  return (
+                    <View key={index} style={styles.projectItem}>
+                      <Text style={styles.jobTitle}>{project.name}</Text>
+                      {descriptionBullets.length > 0 ? (
+                        descriptionBullets.map((bullet, idx) => (
+                          <Text key={idx} style={styles.bullet}>
+                            • {bullet.trim()}
+                          </Text>
+                        ))
+                      ) : project.description ? (
+                        <Text style={styles.bullet}>
+                          • {project.description}
+                        </Text>
+                      ) : null}
+                      {project.technologies && project.technologies.length > 0 && (
+                        <Text style={[styles.company, { marginTop: 6 }]}>
+                          Technologies: {project.technologies.join(', ')}
+                        </Text>
+                      )}
+                    </View>
+                  )
+                })}
               </View>
             )}
 
