@@ -32,28 +32,29 @@ export default function ProjectsSection() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mt-8">
-      <div className="p-6 bg-gradient-to-br from-teal-50 to-emerald-50">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-md">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="p-4 sm:p-6 bg-gradient-to-br from-teal-50 to-emerald-50">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Projects</h2>
-              <p className="text-sm text-gray-600">Your personal and professional projects</p>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Projects</h2>
+              <p className="text-xs sm:text-sm text-gray-600">Your personal and professional projects</p>
             </div>
           </div>
           <button
             onClick={addProject}
-            className="px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-teal-700 hover:to-emerald-700 transition shadow-md"
+            className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-teal-700 hover:to-emerald-700 transition shadow-md"
           >
-            + Add Project
+            <span className="hidden sm:inline">+ Add Project</span>
+            <span className="sm:hidden">+ Add</span>
           </button>
         </div>
       </div>
-      <div className="p-6 border-t border-gray-200">
+      <div className="p-4 sm:p-6 border-t border-gray-200">
         {projects.length === 0 ? (
           <div className="text-center py-12">
             <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

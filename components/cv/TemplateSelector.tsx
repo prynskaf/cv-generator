@@ -97,7 +97,7 @@ export default function TemplateSelector({ selectedTemplate, onSelectTemplate, p
           >
             {/* Template Preview - Shows full CV layout matching actual CV */}
             <div className="aspect-[8.5/11] bg-gray-50 flex items-center justify-center overflow-hidden relative">
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center w-full h-full">
                 <TemplatePreview
                   templateId={template.id}
                   data={previewData}

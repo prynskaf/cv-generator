@@ -22,6 +22,7 @@ export const minimalistStyles = StyleSheet.create({
   },
   profilePictureContainer: {
     marginLeft: 15,
+    flexShrink: 0,
   },
   profilePicture: {
     width: 70,
@@ -29,6 +30,7 @@ export const minimalistStyles = StyleSheet.create({
     borderRadius: 35,
     borderWidth: 1,
     borderColor: '#e5e7eb',
+    objectFit: 'cover',
   },
   name: {
     fontSize: 26,
@@ -112,12 +114,12 @@ export const minimalistStyles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 8,
   },
-  // Skills - Simple comma-separated
+  // Skills - Simple inline, wraps to next line
   skillsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
-    marginTop: 6,
+    marginTop: 4,
+    lineHeight: 1.4,
   },
   skill: {
     fontSize: 9,
@@ -126,6 +128,7 @@ export const minimalistStyles = StyleSheet.create({
   skillSeparator: {
     fontSize: 8,
     color: '#d1d5db',
+    marginHorizontal: 2,
   },
   // Languages
   languagesContainer: {
@@ -159,7 +162,6 @@ export const minimalistStyles = StyleSheet.create({
     fontSize: 9,
     fontWeight: 'normal',
     color: '#6b7280',
-    marginTop: 8,
-    marginBottom: 4,
+    marginRight: 2,
   },
 })

@@ -37,8 +37,8 @@ export default function CertificationCard({ certification, onSave, onDelete }: C
 
   if (isEditing) {
     return (
-      <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-6 shadow-lg">
-        <div className="space-y-4">
+      <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-4 sm:p-6 shadow-lg">
+        <div className="space-y-3 sm:space-y-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Certification Name <span className="text-red-500">*</span>
@@ -65,7 +65,7 @@ export default function CertificationCard({ certification, onSave, onDelete }: C
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Issue Date
@@ -130,16 +130,16 @@ export default function CertificationCard({ certification, onSave, onDelete }: C
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
             <button
               onClick={handleSave}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg hover:shadow-lg transition font-semibold"
+              className="flex-1 px-4 py-2 text-xs sm:text-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg hover:shadow-lg transition font-semibold"
             >
               Save
             </button>
             <button
               onClick={handleCancel}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              className="flex-1 sm:flex-initial px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition"
             >
               Cancel
             </button>
@@ -150,13 +150,13 @@ export default function CertificationCard({ certification, onSave, onDelete }: C
   }
 
   return (
-    <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-bold text-gray-900 mb-1">{certification.name}</h3>
-          <p className="text-amber-700 font-semibold">{certification.issuing_organization}</p>
+    <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0 mb-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 truncate">{certification.name}</h3>
+          <p className="text-sm sm:text-base text-amber-700 font-semibold truncate">{certification.issuing_organization}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-shrink-0">
           <button
             onClick={() => setIsEditing(true)}
             className="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition"
@@ -178,9 +178,9 @@ export default function CertificationCard({ certification, onSave, onDelete }: C
         </div>
       </div>
 
-      <div className="space-y-2 text-sm text-gray-600">
+      <div className="space-y-2 text-xs sm:text-sm text-gray-600">
         {(certification.issue_date || certification.expiry_date) && (
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             {certification.issue_date && (
               <span className="flex items-center gap-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

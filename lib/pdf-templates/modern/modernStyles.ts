@@ -25,6 +25,7 @@ export const modernStyles = StyleSheet.create({
     position: 'absolute',
     right: 30,
     top: 30,
+    flexShrink: 0,
   },
   profilePicture: {
     width: 90,
@@ -32,6 +33,7 @@ export const modernStyles = StyleSheet.create({
     borderRadius: 45, // Circle
     borderWidth: 4,
     borderColor: '#ffffff',
+    objectFit: 'cover',
   },
   name: {
     fontSize: 32,

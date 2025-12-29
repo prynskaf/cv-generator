@@ -128,19 +128,20 @@ export function MinimalistTemplate({ data }: { data: CVData }) {
           <View>
             <Text style={styles.sectionTitle}>Skills</Text>
             {Object.keys(skillsByCategory).length > 1 ? (
-              Object.entries(skillsByCategory).map(([category, skills], index) => (
-                <View key={index}>
-                  <Text style={styles.categoryTitle}>{category}</Text>
-                  <View style={styles.skillsContainer}>
+              <View style={styles.skillsContainer}>
+                {Object.entries(skillsByCategory).map(([category, skills], categoryIndex) => (
+                  <React.Fragment key={categoryIndex}>
+                    {categoryIndex > 0 && <Text style={styles.skillSeparator}> • </Text>}
+                    <Text style={styles.categoryTitle}>{category}: </Text>
                     {skills.map((skill, idx) => (
                       <React.Fragment key={idx}>
                         <Text style={styles.skill}>{skill}</Text>
                         {idx < skills.length - 1 && <Text style={styles.skillSeparator}> • </Text>}
                       </React.Fragment>
                     ))}
-                  </View>
-                </View>
-              ))
+                  </React.Fragment>
+                ))}
+              </View>
             ) : (
               <View style={styles.skillsContainer}>
                 {data.skills?.map((skill, index) => (
@@ -180,7 +181,7 @@ export function MinimalistTemplate({ data }: { data: CVData }) {
                       {project.technologies.map((tech, idx) => (
                         <React.Fragment key={idx}>
                           <Text style={styles.skill}>{tech}</Text>
-                          {idx < project.technologies.length - 1 && <Text style={styles.skillSeparator}> • </Text>}
+                          {idx < (project.technologies?.length ?? 0) - 1 && <Text style={styles.skillSeparator}> • </Text>}
                         </React.Fragment>
                       ))}
                     </View>

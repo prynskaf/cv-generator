@@ -25,6 +25,7 @@ export const professionalStyles = StyleSheet.create({
   },
   profilePictureContainer: {
     marginLeft: 20,
+    flexShrink: 0,
   },
   profilePicture: {
     width: 60,
@@ -32,6 +33,7 @@ export const professionalStyles = StyleSheet.create({
     borderRadius: 30, // Circle
     borderWidth: 2,
     borderColor: '#1a202c',
+    objectFit: 'cover',
   },
   name: {
     fontSize: 24,

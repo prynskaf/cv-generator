@@ -15,15 +15,15 @@ export default function CVUploadCard({
 }: CVUploadCardProps) {
   return (
     <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-xl p-6 sm:p-8 mb-6 text-white">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-12 bg-white/20 backdrop-blur-lg rounded-xl flex items-center justify-center">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex items-center gap-2 sm:gap-3 mb-4">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-lg rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
           </svg>
         </div>
         <div>
-          <h2 className="text-2xl font-bold">Upload Your CV</h2>
-          <p className="text-blue-100 text-sm">AI will automatically extract and fill your profile</p>
+          <h2 className="text-xl sm:text-2xl font-bold">Upload Your CV</h2>
+          <p className="text-blue-100 text-xs sm:text-sm">AI will automatically extract and fill your profile</p>
         </div>
       </div>
       

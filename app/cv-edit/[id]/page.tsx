@@ -280,14 +280,14 @@ export default function CVEditPage() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Back Button */}
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 transition"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back
@@ -296,18 +296,18 @@ export default function CVEditPage() {
 
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900">Edit Your CV</h2>
-              <p className="text-gray-600 mt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div className="flex-1">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Edit Your CV</h2>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">
                 {jobTitle} {companyName && `at ${companyName}`}
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition font-medium flex items-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 {saving ? (
                   <>
@@ -316,17 +316,18 @@ export default function CVEditPage() {
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Save Changes
+                    <span className="hidden sm:inline">Save Changes</span>
+                    <span className="sm:hidden">Save</span>
                   </>
                 )}
               </button>
               <button
                 onClick={handleDownloadCV}
                 disabled={exporting}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition font-medium flex items-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 {exporting ? (
                   <>
@@ -335,10 +336,11 @@ export default function CVEditPage() {
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    Download PDF
+                    <span className="hidden sm:inline">Download PDF</span>
+                    <span className="sm:hidden">Download</span>
                   </>
                 )}
               </button>
@@ -360,7 +362,7 @@ export default function CVEditPage() {
 
         {/* Template Selector */}
         {cvData && (
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <TemplateSelector
               selectedTemplate={selectedTemplate}
               onSelectTemplate={setSelectedTemplate}
@@ -370,9 +372,9 @@ export default function CVEditPage() {
         )}
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Left: AI Chat Editor */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6 order-2 lg:order-1">
             {cvData && (
               <AIChat
                 currentCV={cvData}
@@ -383,14 +385,14 @@ export default function CVEditPage() {
           </div>
 
           {/* Right: Live Preview */}
-          <div className="sticky top-24">
-            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Live Preview</h3>
+          <div className="order-1 lg:order-2 lg:sticky lg:top-24">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-200">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Live Preview</h3>
               {cvData && (
                 <LivePreview
                   templateId={selectedTemplate}
                   data={cvData}
-                  className="max-h-[800px] overflow-y-auto"
+                  className="max-h-[600px] sm:max-h-[800px] overflow-y-auto"
                 />
               )}
             </div>

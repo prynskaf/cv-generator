@@ -32,29 +32,30 @@ export default function CertificationsSection() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mt-8">
-      <div className="p-6 bg-gradient-to-br from-amber-50 to-orange-50">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-md">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="p-4 sm:p-6 bg-gradient-to-br from-amber-50 to-orange-50">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Certifications</h2>
-              <p className="text-sm text-gray-600">Professional certifications and credentials</p>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Certifications</h2>
+              <p className="text-xs sm:text-sm text-gray-600">Professional certifications and credentials</p>
             </div>
           </div>
           <button
             onClick={addCertification}
-            className="px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-lg hover:from-amber-700 hover:to-orange-700 transition shadow-md"
+            className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-lg hover:from-amber-700 hover:to-orange-700 transition shadow-md"
           >
-            + Add Certification
+            <span className="hidden sm:inline">+ Add Certification</span>
+            <span className="sm:hidden">+ Add</span>
           </button>
         </div>
       </div>
       
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {certifications.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

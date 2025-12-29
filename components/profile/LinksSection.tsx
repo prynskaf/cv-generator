@@ -17,18 +17,18 @@ export default function LinksSection({ links, saving, onChange, onSave }: LinksS
     <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
       {/* Header */}
       <div 
-        className="flex items-center justify-between p-6 cursor-pointer bg-gradient-to-r from-cyan-50 to-blue-50 hover:from-cyan-100 hover:to-blue-100 transition"
+        className="flex items-center justify-between p-4 sm:p-6 cursor-pointer bg-gradient-to-r from-cyan-50 to-blue-50 hover:from-cyan-100 hover:to-blue-100 transition"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-md">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Links & Social Media</h2>
-            <p className="text-sm text-gray-600">LinkedIn, GitHub, Portfolio, etc.</p>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Links & Social Media</h2>
+            <p className="text-xs sm:text-sm text-gray-600">LinkedIn, GitHub, Portfolio, etc.</p>
           </div>
         </div>
         <svg 

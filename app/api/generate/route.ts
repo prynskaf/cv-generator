@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     const userSkillNames = new Set((skills || []).map(s => s.skill_name.toLowerCase().trim()))
     const jobSkillsLower = analysis.required_skills.map(s => s.toLowerCase().trim())
     
-    const filteredSkills = (tailoredCV.skills || []).filter(skill => {
+    const filteredSkills = (tailoredCV.skills || []).filter((skill: { skill_name?: string; skill_level?: string }) => {
       const skillNameLower = skill.skill_name?.toLowerCase().trim() || ''
       // Only include if:
       // 1. User actually has this skill, OR
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
     })
     
     // Post-process: Limit experience bullet points to 1-3 and shorten sentences
-    const processedExperiences = (tailoredCV.experiences || []).map(exp => {
+    const processedExperiences = (tailoredCV.experiences || []).map((exp: { description?: string; [key: string]: any }) => {
       if (!exp.description) return exp
       
       const bullets = exp.description.split('\n').filter(b => b.trim().length > 0)
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
     })
     
     // Post-process: Shorten project descriptions to one line
-    const processedProjects = (tailoredCV.projects || []).map(project => {
+    const processedProjects = (tailoredCV.projects || []).map((project: { description?: string; [key: string]: any }) => {
       if (!project.description) return project
       
       const words = project.description.trim().split(/\s+/)

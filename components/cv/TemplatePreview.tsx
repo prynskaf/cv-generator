@@ -24,6 +24,7 @@ export default function TemplatePreview({ templateId, data, className = '' }: Te
       }}
     >
       <div
+        className="template-preview-scaler"
         style={{
           transform: 'scale(0.25)',
           transformOrigin: 'top left',
