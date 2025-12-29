@@ -12,6 +12,7 @@ export default function ContactPage() {
   })
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,7 +69,8 @@ export default function ContactPage() {
               </h1>
             </Link>
             
-            <div className="flex items-center gap-4">
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-4">
               <Link
                 href="/login"
                 className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
@@ -82,7 +84,37 @@ export default function ContactPage() {
                 Sign Up Free
               </Link>
             </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden pb-4 space-y-2">
+              <Link
+                href="/login"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                href="/signup"
+                className="block px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:shadow-lg transition"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Sign Up Free
+              </Link>
+            </div>
+          )}
         </div>
       </nav>
 
