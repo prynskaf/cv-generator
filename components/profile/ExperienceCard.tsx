@@ -33,12 +33,12 @@ export default function ExperienceCard({ experience, index, onSave, onDelete, on
     <div className="border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-300 transition bg-white">
       {/* Header - Always Visible */}
       <div 
-        className="flex items-center justify-between p-4 cursor-pointer bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 transition"
+        className="flex items-center justify-between p-3 sm:p-4 cursor-pointer bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 transition"
         onClick={handleToggle}
       >
-        <div className="flex-1">
-          <h3 className="font-bold text-gray-900">{experience.position || 'New Position'}</h3>
-          <p className="text-sm text-gray-600">{experience.company || 'Company'} • {experience.location || 'Location'}</p>
+        <div className="flex-1 min-w-0 pr-2">
+          <h3 className="font-bold text-sm sm:text-base text-gray-900 truncate">{experience.position || 'New Position'}</h3>
+          <p className="text-xs sm:text-sm text-gray-600 truncate">{experience.company || 'Company'} • {experience.location || 'Location'}</p>
         </div>
         <div className="ml-4 p-2 rounded-lg hover:bg-white/50 transition">
           <svg 
@@ -54,8 +54,8 @@ export default function ExperienceCard({ experience, index, onSave, onDelete, on
 
       {/* Expandable Content */}
       {isExpanded && (
-        <div className="p-6 border-t border-gray-200" onClick={(e) => e.stopPropagation()}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-4 sm:p-6 border-t border-gray-200" onClick={(e) => e.stopPropagation()}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Company</label>
               <input
@@ -128,10 +128,10 @@ export default function ExperienceCard({ experience, index, onSave, onDelete, on
               placeholder="Describe your responsibilities and achievements..."
             />
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-col sm:flex-row gap-2">
             <button
               onClick={handleSave}
-              className="px-6 py-2 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-md flex items-center gap-2"
+              className="flex-1 sm:flex-initial px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-md flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -140,7 +140,7 @@ export default function ExperienceCard({ experience, index, onSave, onDelete, on
             </button>
             <button
               onClick={handleDelete}
-              className="px-6 py-2 text-sm font-semibold bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition flex items-center gap-2"
+              className="flex-1 sm:flex-initial px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

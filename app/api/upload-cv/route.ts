@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { extractCVData, type ExtractedCVData } from '@/lib/gemini'
 import mammoth from 'mammoth'
 import PDFParser from 'pdf2json'
+import { handleApiError } from '@/lib/utils/errors'
+import { requireAuth } from '@/lib/utils/auth'
+import { errorResponse } from '@/lib/utils/api-response'
 
 function normalizeDate(dateString: string | null | undefined): string | null {
   if (!dateString) return null
@@ -25,18 +27,29 @@ function normalizeDate(dateString: string | null | undefined): string | null {
   return null
 }
 
+interface PDFParserError {
+  parserError?: string | Error
+}
+
+interface IPDFParser {
+  on(event: 'pdfParser_dataError', handler: (errData: PDFParserError) => void): void
+  on(event: 'pdfParser_dataReady', handler: () => void): void
+  parseBuffer(buffer: Buffer): void
+  getRawTextContent(): string
+}
+
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   return new Promise((resolve, reject) => {
-    const pdfParser = new (PDFParser as any)(null, 1)
+    const pdfParser = new (PDFParser as unknown as new (config: null, version: number) => IPDFParser)(null, 1)
     
-    pdfParser.on('pdfParser_dataError', (errData: any) => {
+    pdfParser.on('pdfParser_dataError', (errData: PDFParserError) => {
       console.error('PDF parsing error:', errData.parserError)
       reject(new Error('Failed to extract text from PDF'))
     })
     
     pdfParser.on('pdfParser_dataReady', () => {
       try {
-        const text = (pdfParser as any).getRawTextContent()
+        const text = pdfParser.getRawTextContent()
         resolve(text)
       } catch (error) {
         console.error('PDF text extraction error:', error)
@@ -55,18 +68,7 @@ async function extractTextFromDOCX(buffer: Buffer): Promise<string> {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    const { user, supabase } = await requireAuth()
 
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -87,6 +89,22 @@ export async function POST(request: NextRequest) {
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
         { error: 'Invalid file type. Please upload a PDF or Word document.' },
+        { status: 400 }
+      )
+    }
+
+    // Validate file size (max 10MB)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB in bytes
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: 'File size must be less than 10MB. Please upload a smaller file.' },
+        { status: 400 }
+      )
+    }
+
+    if (file.size === 0) {
+      return NextResponse.json(
+        { error: 'File is empty. Please upload a valid file.' },
         { status: 400 }
       )
     }
@@ -132,10 +150,16 @@ export async function POST(request: NextRequest) {
       throw profileError
     }
 
-    await supabase
+    // Delete existing experiences
+    const { error: deleteExpError } = await supabase
       .from('experiences')
       .delete()
       .eq('user_id', user.id)
+
+    if (deleteExpError) {
+      console.error('Error deleting experiences:', deleteExpError)
+      // Continue anyway - not critical
+    }
 
     if (extractedData.experience && extractedData.experience.length > 0) {
       const experiencesData = extractedData.experience.map((exp) => ({
@@ -160,10 +184,16 @@ export async function POST(request: NextRequest) {
       console.log(`✅ Inserted ${experiencesData.length} experiences`)
     }
 
-    await supabase
+    // Delete existing education
+    const { error: deleteEduError } = await supabase
       .from('education')
       .delete()
       .eq('user_id', user.id)
+
+    if (deleteEduError) {
+      console.error('Error deleting education:', deleteEduError)
+      // Continue anyway - not critical
+    }
 
     if (extractedData.education && extractedData.education.length > 0) {
       const educationData = extractedData.education.map((edu) => ({
@@ -189,10 +219,16 @@ export async function POST(request: NextRequest) {
       console.log(`✅ Inserted ${educationData.length} education entries`)
     }
 
-    await supabase
+    // Delete existing skills
+    const { error: deleteSkillsError } = await supabase
       .from('skills')
       .delete()
       .eq('user_id', user.id)
+
+    if (deleteSkillsError) {
+      console.error('Error deleting skills:', deleteSkillsError)
+      // Continue anyway - not critical
+    }
 
     if (extractedData.skills && extractedData.skills.length > 0) {
       const skillsData = extractedData.skills.map((skill) => ({
@@ -213,10 +249,16 @@ export async function POST(request: NextRequest) {
       console.log(`✅ Inserted ${skillsData.length} skills`)
     }
 
-    await supabase
+    // Delete existing links
+    const { error: deleteLinksError } = await supabase
       .from('links')
       .delete()
       .eq('user_id', user.id)
+
+    if (deleteLinksError) {
+      console.error('Error deleting links:', deleteLinksError)
+      // Continue anyway - not critical
+    }
 
     if (extractedData.links) {
       const { error: linksError } = await supabase
@@ -235,10 +277,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    await supabase
+    // Delete existing languages
+    const { error: deleteLangError } = await supabase
       .from('languages')
       .delete()
       .eq('user_id', user.id)
+
+    if (deleteLangError) {
+      console.error('Error deleting languages:', deleteLangError)
+      // Continue anyway - not critical
+    }
 
     if (extractedData.languages && extractedData.languages.length > 0) {
       const languagesData = extractedData.languages.map((lang) => ({
@@ -257,10 +305,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    await supabase
+    // Delete existing projects
+    const { error: deleteProjectsError } = await supabase
       .from('projects')
       .delete()
       .eq('user_id', user.id)
+
+    if (deleteProjectsError) {
+      console.error('Error deleting projects:', deleteProjectsError)
+      // Continue anyway - not critical
+    }
 
     if (extractedData.projects && extractedData.projects.length > 0) {
       const projectsData = extractedData.projects.map((proj) => ({
@@ -286,11 +340,9 @@ export async function POST(request: NextRequest) {
       data: extractedData,
     })
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('CV upload error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to process CV' },
-      { status: 500 }
-    )
+    const { statusCode, userMessage } = handleApiError(error)
+    return errorResponse(userMessage, statusCode)
   }
 }

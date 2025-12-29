@@ -3,132 +3,207 @@ import { colors } from '../shared/styles'
 
 export const professionalStyles = StyleSheet.create({
   page: {
-    padding: 50,
+    padding: 0,
     backgroundColor: colors.professional.background,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Helvetica', // Professional sans-serif
   },
+  // Header with thick top border - Classic resume style
   header: {
-    marginBottom: 25,
-    textAlign: 'center',
-    paddingBottom: 20,
-    borderBottomWidth: 3,
-    borderBottomColor: colors.professional.primary,
+    paddingTop: 20,
+    paddingBottom: 15,
+    paddingHorizontal: 40,
+    borderTopWidth: 4,
+    borderTopColor: '#1a202c', // Gray-800 - thick top border
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 15,
+  },
+  headerLeft: {
+    flex: 1,
+    paddingRight: 20,
+  },
+  profilePictureContainer: {
+    marginLeft: 20,
+    flexShrink: 0,
+  },
+  profilePicture: {
+    width: 60,
+    height: 60,
+    borderRadius: 30, // Circle
+    borderWidth: 2,
+    borderColor: '#1a202c',
+    objectFit: 'cover',
   },
   name: {
-    fontSize: 36,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: colors.professional.primary,
-    marginBottom: 8,
-    letterSpacing: 1,
+    color: '#1a202c',
+    marginBottom: 6,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
   },
   contactRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
     flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 10,
-    fontSize: 10,
+    gap: 6,
+    fontSize: 9,
     color: colors.professional.light,
+    marginTop: 4,
   },
   linksRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
     flexWrap: 'wrap',
-    gap: 15,
-    marginTop: 8,
+    gap: 8,
+    marginTop: 6,
     fontSize: 9,
+    color: colors.professional.primary,
   },
   linkItem: {
     color: colors.professional.primary,
   },
+  // Main Content - Sidebar Layout (65/35)
+  mainContent: {
+    flexDirection: 'row',
+    paddingHorizontal: 40,
+  },
+  // Main Content Area (left, 65%)
+  content: {
+    width: '65%',
+    paddingRight: 20,
+  },
+  // Right Sidebar (35%)
+  sidebar: {
+    width: '35%',
+    paddingLeft: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: '#1a202c',
+  },
+  // Section Titles - Uppercase, professional, thick underline to match header
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
-    color: colors.professional.primary,
-    marginTop: 20,
-    marginBottom: 12,
-    paddingBottom: 4,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.professional.primary,
+    color: '#1a202c',
+    marginTop: 12,
+    marginBottom: 8,
+    paddingBottom: 3,
+    borderBottomWidth: 3,
+    borderBottomColor: '#1a202c',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 1.5,
   },
   sectionTitleFirst: {
-    marginTop: 10,
+    marginTop: 0,
   },
   summary: {
     fontSize: 10,
     color: colors.professional.text,
-    lineHeight: 1.7,
+    lineHeight: 1.5,
     textAlign: 'justify',
-    marginBottom: 5,
+    marginBottom: 0,
+    fontStyle: 'italic',
   },
   jobHeader: {
-    marginBottom: 8,
+    marginBottom: 6,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  jobHeaderLeft: {
+    flex: 1,
+    paddingRight: 12,
   },
   jobTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold',
     color: colors.professional.secondary,
+    marginBottom: 2,
   },
   company: {
-    fontSize: 10,
+    fontSize: 9,
     color: colors.professional.text,
-    marginTop: 3,
+    marginTop: 1,
   },
   date: {
     fontSize: 9,
     color: colors.professional.light,
     fontStyle: 'italic',
-    marginTop: 2,
+    textAlign: 'right',
+    minWidth: 110,
+    marginTop: 0,
   },
   bullet: {
-    fontSize: 10,
+    fontSize: 9,
     color: colors.professional.text,
-    lineHeight: 1.6,
+    lineHeight: 1.4,
     marginLeft: 15,
-    marginBottom: 5,
+    marginBottom: 3,
   },
   description: {
-    fontSize: 10,
+    fontSize: 9,
     color: colors.professional.text,
-    lineHeight: 1.6,
-    marginTop: 6,
-    marginBottom: 12,
+    lineHeight: 1.4,
+    marginTop: 4,
+    marginBottom: 8,
   },
-  skillsGrid: {
+  // Skills - Bullet points in two columns
+  skillsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 8,
+    marginTop: 6,
+  },
+  skillColumn: {
+    width: '48%',
+    paddingRight: 8,
   },
   skill: {
     fontSize: 9,
-    color: colors.professional.primary,
-    padding: '6 12',
-    borderWidth: 1,
-    borderColor: colors.professional.accent,
-    borderRadius: 4,
+    color: colors.professional.text,
+    lineHeight: 1.4,
+    marginLeft: 0,
+    marginBottom: 2,
   },
-  languagesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 15,
+  categoryTitle: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: colors.professional.secondary,
     marginTop: 8,
+    marginBottom: 4,
+  },
+  // Languages
+  languagesContainer: {
+    flexDirection: 'column',
+    gap: 6,
+    marginTop: 6,
   },
   languageItem: {
-    fontSize: 10,
+    fontSize: 9,
     color: colors.professional.text,
   },
   languageName: {
     fontWeight: 'bold',
     color: colors.professional.secondary,
   },
-  categoryTitle: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: colors.professional.secondary,
-    marginTop: 10,
+  // Links
+  link: {
+    fontSize: 9,
+    color: colors.professional.primary,
     marginBottom: 6,
+    textDecoration: 'none',
+  },
+  linkLabel: {
+    fontWeight: 'bold',
+  },
+  // Education
+  educationItem: {
+    marginBottom: 10,
+  },
+  // Projects
+  projectItem: {
+    marginBottom: 10,
+  },
+  // Certifications
+  certificationItem: {
+    marginBottom: 10,
   },
 })

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Document, Page, Text, View } from '@react-pdf/renderer'
+import { Document, Page, Text, View, Image } from '@react-pdf/renderer'
 import { CVData, formatDate, splitIntoBullets, groupSkillsByCategory } from '../shared/types'
 import { modernStyles as styles } from './modernStyles'
 
@@ -9,27 +9,45 @@ export function ModernTemplate({ data }: { data: CVData }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header Section */}
+        {/* Header - Clean, modern header with profile pic on right */}
         <View style={styles.header}>
-          <Text style={styles.name}>{data.full_name || 'Your Name'}</Text>
-          {data.summary && (
-            <Text style={styles.tagline}>
-              {data.summary.substring(0, 100)}
-              {data.summary.length > 100 ? '...' : ''}
-            </Text>
-          )}
-          <View style={styles.contactRow}>
-            {data.email && <Text>{data.email}</Text>}
-            {data.phone && <Text>• {data.phone}</Text>}
-            {data.location && <Text>• {data.location}</Text>}
+          <View style={styles.headerContent}>
+            <Text style={styles.name}>{data.full_name || 'Your Name'}</Text>
+            <View style={styles.contactRow}>
+              {data.email && <Text>{data.email}</Text>}
+              {data.phone && <Text>• {data.phone}</Text>}
+              {data.location && <Text>• {data.location}</Text>}
+            </View>
+            {data.links && (data.links.linkedin || data.links.github || data.links.portfolio) && (
+              <View style={styles.contactRow}>
+                {data.links.linkedin && (
+                  <Text>LinkedIn: {data.links.linkedin.replace('https://', '').replace('http://', '').replace('www.', '')}</Text>
+                )}
+                {data.links.github && (
+                  <Text>• GitHub: {data.links.github.replace('https://', '').replace('http://', '').replace('www.', '')}</Text>
+                )}
+                {data.links.portfolio && (
+                  <Text>• Portfolio: {data.links.portfolio.replace('https://', '').replace('http://', '').replace('www.', '')}</Text>
+                )}
+              </View>
+            )}
           </View>
+          {/* Profile Picture - Floating in header corner */}
+          {data.show_profile_picture !== false && data.profile_picture_url && (
+            <View style={styles.profilePictureContainer}>
+              <Image
+                src={data.profile_picture_url}
+                style={styles.profilePicture}
+              />
+            </View>
+          )}
         </View>
 
-        {/* Two-Column Layout */}
+        {/* Asymmetric Grid Layout - 30/70 split */}
         <View style={styles.mainContent}>
-          {/* Left Sidebar */}
+          {/* Left Sidebar - 30% width, colored background */}
           <View style={styles.sidebar}>
-            {/* Skills Section */}
+            {/* Skills Section - Vertical badges */}
             {data.skills && data.skills.length > 0 && (
               <View>
                 <Text style={[styles.sectionTitle, styles.sectionTitleFirst]}>Skills</Text>
@@ -105,7 +123,7 @@ export function ModernTemplate({ data }: { data: CVData }) {
             )}
           </View>
 
-          {/* Right Content */}
+          {/* Right Content - 70% width */}
           <View style={styles.content}>
             {/* Professional Summary */}
             {data.summary && (
@@ -115,14 +133,14 @@ export function ModernTemplate({ data }: { data: CVData }) {
               </View>
             )}
 
-            {/* Experience Section */}
+            {/* Experience Section - Clean, aligned with Summary */}
             {data.experiences && data.experiences.length > 0 && (
               <View>
                 <Text style={styles.sectionTitle}>Experience</Text>
                 {data.experiences.map((exp, index) => {
                   const bullets = splitIntoBullets(exp.description)
                   return (
-                    <View key={index} style={{ marginBottom: 14 }}>
+                    <View key={index} style={styles.experienceItem}>
                       <View style={styles.jobHeader}>
                         <Text style={styles.jobTitle}>{exp.position}</Text>
                         <Text style={styles.company}>
@@ -132,11 +150,17 @@ export function ModernTemplate({ data }: { data: CVData }) {
                           {formatDate(exp.start_date)} - {exp.is_current ? 'Present' : formatDate(exp.end_date || '')}
                         </Text>
                       </View>
-                      {bullets.map((bullet, idx) => (
-                        <Text key={idx} style={styles.bullet}>
-                          • {bullet}
+                      {bullets.length > 0 ? (
+                        bullets.map((bullet, idx) => (
+                          <Text key={idx} style={styles.bullet}>
+                            • {bullet.trim()}
+                          </Text>
+                        ))
+                      ) : (
+                        <Text style={styles.bullet}>
+                          • {exp.description}
                         </Text>
-                      ))}
+                      )}
                     </View>
                   )
                 })}
@@ -148,7 +172,7 @@ export function ModernTemplate({ data }: { data: CVData }) {
               <View>
                 <Text style={styles.sectionTitle}>Education</Text>
                 {data.education.map((edu, index) => (
-                  <View key={index} style={{ marginBottom: 12 }}>
+                  <View key={index} style={styles.educationItem}>
                     <Text style={styles.jobTitle}>
                       {edu.degree} in {edu.field_of_study}
                     </Text>
@@ -163,22 +187,47 @@ export function ModernTemplate({ data }: { data: CVData }) {
               </View>
             )}
 
-            {/* Projects Section */}
+            {/* Projects Section - 2-column card grid */}
             {data.projects && data.projects.length > 0 && (
               <View>
                 <Text style={styles.sectionTitle}>Projects</Text>
-                {data.projects.map((project, index) => (
-                  <View key={index} style={{ marginBottom: 12 }}>
-                    <Text style={styles.jobTitle}>{project.name}</Text>
-                    <Text style={styles.description}>{project.description}</Text>
-                    {project.technologies && project.technologies.length > 0 && (
-                      <View style={styles.skillsContainer}>
-                        {project.technologies.map((tech, idx) => (
-                          <Text key={idx} style={styles.skill}>
-                            {tech}
-                          </Text>
-                        ))}
-                      </View>
+                <View style={styles.projectsGrid}>
+                  {data.projects.map((project, index) => (
+                    <View key={index} style={styles.projectCard}>
+                      <Text style={styles.projectName}>{project.name}</Text>
+                      <Text style={styles.projectDesc}>{project.description}</Text>
+                      {project.technologies && project.technologies.length > 0 && (
+                        <Text style={styles.projectTech}>
+                          {project.technologies.join(' • ')}
+                        </Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Certifications Section */}
+            {data.certifications && data.certifications.length > 0 && (
+              <View>
+                <Text style={styles.sectionTitle}>Certifications</Text>
+                {data.certifications.map((cert, index) => (
+                  <View key={index} style={styles.certificationItem}>
+                    <Text style={styles.jobTitle}>{cert.name}</Text>
+                    <Text style={styles.company}>{cert.issuing_organization}</Text>
+                    {(cert.issue_date || cert.expiry_date) && (
+                      <Text style={styles.date}>
+                        {cert.issue_date ? formatDate(cert.issue_date) : ''}
+                        {cert.issue_date && cert.expiry_date ? ' - ' : ''}
+                        {cert.expiry_date ? formatDate(cert.expiry_date) : ''}
+                        {cert.issue_date && !cert.expiry_date ? ' (Issued)' : ''}
+                      </Text>
+                    )}
+                    {cert.credential_id && (
+                      <Text style={styles.description}>Credential ID: {cert.credential_id}</Text>
+                    )}
+                    {cert.description && (
+                      <Text style={styles.description}>{cert.description}</Text>
                     )}
                   </View>
                 ))}
